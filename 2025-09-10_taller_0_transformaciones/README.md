@@ -1,6 +1,6 @@
 # Taller 0 - Transformaciones Básicas en Computación Visual
 
-**Fecha:** 2025-09-05
+**Fecha:** 2025-09-10
 
 ## Objetivo del Taller
 
@@ -28,7 +28,7 @@ Explorar los conceptos fundamentales de transformaciones geométricas (traslaci�
 ## Estructura del Proyecto
 
 ```
-2025-09-05_taller_0_transformaciones/
+2025-09-10_taller_0_transformaciones/
 ├── python/                    # Implementación 2D con matplotlib
 │   ├── transformaciones_2d.py    # Script principal
 │   ├── requirements.txt           # Dependencias

@@ -4,7 +4,7 @@ using UnityEngine;
 /// Taller 0 - Transformaciones Básicas en Unity
 /// Script que aplica transformaciones geométricas básicas a GameObjects
 /// Autor: [Tu nombre]
-/// Fecha: 2025-09-05
+/// Fecha: 2025-09-10
 /// </summary>
 public class TransformacionesBasicas : MonoBehaviour
 {

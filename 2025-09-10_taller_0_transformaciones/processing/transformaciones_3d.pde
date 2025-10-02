@@ -2,7 +2,7 @@
  * Taller 0 - Transformaciones Básicas en Processing
  * Implementación de transformaciones geométricas 3D
  * Autor: [Tu nombre]
- * Fecha: 2025-09-05
+ * Fecha: 2025-09-10
  */
 
 // Variables globales para animación

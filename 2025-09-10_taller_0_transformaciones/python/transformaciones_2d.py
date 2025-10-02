@@ -2,7 +2,7 @@
 Taller 0 - Transformaciones Básicas en Python
 Implementación de transformaciones geométricas 2D con matplotlib y numpy
 Autor: [Tu nombre]
-Fecha: 2025-09-05
+Fecha: 2025-09-10
 """
 
 import numpy as np
