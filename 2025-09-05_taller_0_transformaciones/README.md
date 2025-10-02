@@ -141,22 +141,27 @@ Este taller requiere explícitamente un GIF animado:
 
 ![Transformaciones Python](./resultados/hola_mundo_transformaciones_python.gif)
 **Python - Transformaciones 2D con matplotlib**
-- Traslación circular (cubo rojo)
+- Traslación senoidal (cubo rojo)
 - Rotación continua (esfera verde)  
 - Escala oscilante (triángulo naranja)
 - Transformación compuesta (figura púrpura)
+- Matrices homogéneas explícitas con numpy
 
 ![Transformaciones Three.js](./resultados/hola_mundo_transformaciones_threejs.gif)
 **Three.js - Transformaciones 3D interactivas**
-- Navegación con OrbitControls
-- Objetos con diferentes transformaciones simultáneas
-- Iluminación y sombras realistas
+- Cubo rojo: Traslación senoidal 3D
+- Esfera verde: Rotación multi-eje
+- Cono azul: Escala oscilante
+- Torus amarillo: Transformación compuesta
+- Navegación OrbitControls + iluminación realista
 
 ![Transformaciones Processing](./resultados/hola_mundo_transformaciones_processing.gif)
 **Processing - Sketch 3D nativo**
-- Control de cámara con mouse
-- Sistema de coordenadas visible
-- Múltiples objetos animados simultáneamente
+- Cubo rojo: Traslación senoidal
+- Esfera verde: Rotación con marcador visual
+- Cilindro azul: Escala oscilante
+- Torus amarillo: Transformación compuesta
+- Control de cámara interactivo + grid de referencia
 
 ### Características Demostradas en los GIFs
 
@@ -187,11 +192,12 @@ Este taller requiere explícitamente un GIF animado:
 - **Transformaciones**: translate(), rotate(), scale() con aislamiento de estado
 - **Salida**: Aplicación ejecutable con captura de pantalla
 
-### 4. Unity (C# + Transform API)
+### 4. Unity (C# + Transform API) - **OPCIONAL**
 - **Enfoque**: GameObjects con componentes y scripts
 - **Fortalezas**: Editor visual, Time.deltaTime, inspector en tiempo real
 - **Transformaciones**: transform.position, transform.Rotate(), transform.localScale
 - **Salida**: Proyecto Unity ejecutable
+- **Estado**: Scripts implementados, instalación opcional
 
 ## Prompts Usados
 
@@ -278,7 +284,9 @@ Los conceptos aprendidos son fundamentales para:
 - ✅ Commits descriptivos en inglés
 
 ### Completado ✅
-- ✅ **Hola Mundo Visual** implementado en 4 entornos
-- ✅ **Transformaciones básicas** funcionando correctamente
-- ✅ **Animaciones temporales** fluidas y sincronizadas
-- ✅ **Documentación completa** siguiendo el template oficial
+- ✅ **Hola Mundo Visual** implementado en 3 entornos principales + Unity opcional
+- ✅ **Transformaciones básicas** funcionando correctamente en todos los entornos
+- ✅ **Animaciones temporales** fluidas y sincronizadas usando funciones matemáticas
+- ✅ **GIFs animados** generados para Python, Three.js y Processing
+- ✅ **Documentación completa** siguiendo el template oficial con evidencias visuales
+- ✅ **Código funcional** y bien documentado en cada entorno

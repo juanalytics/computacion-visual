@@ -32,3 +32,15 @@ Este script implementa transformaciones geométricas básicas en 2D:
 
 - `transformaciones_estaticas.png`: Imagen con todas las transformaciones
 - `hola_mundo_transformaciones_python.gif`: Animación completa
+
+## Resultado Visual
+
+![Transformaciones Python](../resultados/hola_mundo_transformaciones_python.gif)
+
+**Transformaciones 2D implementadas:**
+- **Cubo rojo**: Traslación senoidal en X e Y
+- **Esfera verde**: Rotación continua incremental  
+- **Triángulo naranja**: Escala oscilante
+- **Figura púrpura**: Transformación compuesta (traslación + rotación + escala)
+
+La animación muestra matrices de transformación homogéneas aplicadas en tiempo real usando `numpy` y `matplotlib`.

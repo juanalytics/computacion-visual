@@ -56,3 +56,15 @@ Este sketch implementa transformaciones geométricas básicas en 3D usando Proce
 - `scale()`: Escalado uniforme o no uniforme
 - `frameCount` y tiempo personalizado para animaciones
 - `P3D`: Renderer 3D de Processing
+
+## Resultado Visual
+
+![Transformaciones Processing](../resultados/hola_mundo_transformaciones_processing.gif)
+
+**Transformaciones 3D implementadas:**
+- **Cubo Rojo**: Traslación senoidal suave en 3D con diferentes frecuencias por eje
+- **Esfera Verde**: Rotación continua en X, Y, Z con marcador rojo para visualizar el giro
+- **Cilindro Azul**: Escala oscilante construido con `beginShape()/endShape()`
+- **Torus Amarillo**: Transformación compuesta con traslación circular, rotación y escala
+
+La animación muestra el sistema `pushMatrix()/popMatrix()` para aislar transformaciones, controles de cámara interactivos con mouse, y el sistema de coordenadas 3D con grid de referencia.

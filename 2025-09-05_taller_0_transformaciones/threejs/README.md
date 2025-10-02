@@ -55,3 +55,15 @@ Este proyecto implementa transformaciones geométricas básicas en 3D usando Rea
 - React Three Fiber: Renderer de Three.js para React
 - React Three Drei: Utilidades y helpers
 - Three.js: Biblioteca 3D principal
+
+## Resultado Visual
+
+![Transformaciones Three.js](../resultados/hola_mundo_transformaciones_threejs.gif)
+
+**Transformaciones 3D implementadas:**
+- **Cubo Rojo**: Traslación senoidal en trayectoria 3D compleja
+- **Esfera Verde**: Rotación continua en múltiples ejes simultáneamente
+- **Cono Azul**: Escala oscilante uniforme usando función senoidal
+- **Torus Amarillo**: Transformación compuesta (traslación circular + rotación + escala)
+
+La animación demuestra el uso de `useFrame` hook para animaciones fluidas, OrbitControls para navegación interactiva, y el sistema completo de iluminación y sombras de Three.js.
