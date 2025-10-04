@@ -216,11 +216,11 @@ class OjosDigitales:
 def main():
     """Función principal"""
     # Crear directorio de resultados
-    output_dir = Path("resultados")
+    output_dir = Path("../resultados")
     output_dir.mkdir(exist_ok=True)
     
     # Ruta de imagen de ejemplo (se puede cambiar)
-    image_path = "assets/sample_image.jpg"
+    image_path = "../assets/sample_image.jpg"
     
     # Si no existe la imagen de ejemplo, crear una
     if not os.path.exists(image_path):
@@ -238,7 +238,7 @@ def main():
                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
         
         # Guardar imagen de prueba
-        os.makedirs("assets", exist_ok=True)
+        os.makedirs("../assets", exist_ok=True)
         cv2.imwrite(image_path, test_image)
         print(f"✓ Imagen de ejemplo creada: {image_path}")
     
