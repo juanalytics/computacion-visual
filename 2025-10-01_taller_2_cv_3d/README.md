@@ -27,15 +27,45 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 - Desafío en la optimización de parámetros para diferentes tipos de imágenes
 - Mejora futura: implementar filtros adaptativos basados en contenido
 
-### Ejercicio 3 — Segmentando el Mundo (Binarización y Contornos) 🔄
+### Ejercicio 3 — Segmentando el Mundo (Binarización y Contornos) ✅
 **Meta:** Umbralización (fija y adaptativa) y detección de formas.
 
-**Estado:** En desarrollo
+**Implementación:**
+- 4 métodos de umbralización (Fixed, Adaptive Mean, Adaptive Gaussian, Otsu)
+- Detección de contornos con análisis geométrico
+- Cálculo de propiedades (área, perímetro, centroides)
+- Clasificación automática de formas (triángulo, cuadrado, círculo)
+- Visualización con contornos, centroides y cajas delimitadoras
+- GIF animado mostrando el proceso de segmentación
 
-### Ejercicio 4 — Imagen = Matriz (Canales, Slicing, Histogramas) 🔄
+**Evidencia:** Comparación visual 2x3 + GIF animado mostrando original → segmentado → contornos/centroides.
+
+**Código:** [Ver implementación](./ejercicios/03_segmentacion_umbral_contornos/)
+
+**Comentarios personales:**
+- Aprendizaje sobre diferentes métodos de umbralización y sus aplicaciones
+- Desafío en la optimización de parámetros para detección de contornos
+- Mejora futura: implementar segmentación basada en watershed
+
+### Ejercicio 4 — Imagen = Matriz (Canales, Slicing, Histogramas) ✅
 **Meta:** Manipular pixeles y regiones directamente.
 
-**Estado:** En desarrollo
+**Implementación:**
+- Separación de canales RGB y HSV individuales
+- Operaciones de slicing y edición de regiones específicas
+- Análisis de histogramas de intensidades
+- Operaciones de brillo y contraste
+- Transformaciones de matriz (inversión, rotación, bitwise)
+- Visualización comparativa 4x4 con 16 operaciones diferentes
+
+**Evidencia:** Comparación visual 4x4 + análisis de histogramas 2x2 mostrando todas las operaciones de matriz.
+
+**Código:** [Ver implementación](./ejercicios/04_imagen_matriz_pixeles/)
+
+**Comentarios personales:**
+- Aprendizaje sobre manipulación directa de píxeles y matrices
+- Desafío en la optimización de operaciones vectorizadas con NumPy
+- Mejora futura: implementar operaciones de convolución personalizadas
 
 ## Herramientas y Entornos
 - **Python** (opencv-python, numpy, matplotlib, jupyter)
