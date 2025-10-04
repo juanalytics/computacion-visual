@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Generated results (keep structure)
+resultados/*.png
+resultados/*.jpg
+resultados/*.gif
+!resultados/.gitkeep
+
+# Sample images (keep structure)
+assets/*.jpg
+assets/*.png
+assets/*.gif
+!assets/.gitkeep
+
+# Logs
+*.log
