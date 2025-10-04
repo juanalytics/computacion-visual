@@ -88,6 +88,25 @@ Secuencia animada mostrando:
 - Clasificación automática de formas (triángulo, cuadrado, círculo)
 - Comparación de rendimiento entre métodos
 
+## Resultados Clave
+
+### Métodos de Umbralización Implementados
+- **Fixed Threshold**: Umbral fijo en 127 (simple pero limitado)
+- **Adaptive Mean**: Ventana 11x11, constante C=2 (adaptativo local)
+- **Adaptive Gaussian**: Ventana 11x11, constante C=2 (adaptativo gaussiano)
+- **Otsu**: Selección automática de umbral óptimo
+
+### Detección y Análisis de Contornos
+- **Filtrado por área**: Mínimo 500 píxeles para excluir ruido
+- **Propiedades calculadas**: Área, perímetro, centroides, momentos
+- **Clasificación de formas**: Basada en número de vértices de aproximación poligonal
+- **Visualización**: Contornos verdes, centroides rojos, cajas delimitadoras azules
+
+### GIF Animado
+- **Duración**: 1.5 segundos por frame
+- **Secuencia**: Original → 4 métodos de umbralización → Contornos detectados
+- **Transiciones**: Suaves entre métodos mostrando diferencias visuales
+
 ## Características Técnicas
 
 ### Optimizaciones Implementadas

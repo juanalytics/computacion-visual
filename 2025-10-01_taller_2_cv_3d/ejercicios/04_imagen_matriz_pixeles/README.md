@@ -95,6 +95,26 @@ El script genera una imagen con 16 paneles mostrando:
 - **Canales HSV**: Distribución en espacio perceptual
 - **Antes vs Después**: Comparación de histogramas
 
+## Resultados Clave
+
+### Operaciones de Slicing Implementadas
+- **Región Roja**: Slicing [100:200, 150:300] + cambio a rojo (255,0,0)
+- **Copia y Pega**: Copia [50:150, 50:150] → pega [250:350, 250:350]
+- **Blur Selectivo**: Aplica Gaussian blur solo a [200:300, 200:400]
+- **Máscara Circular**: Círculo en (300,200) radio 80 → verde (0,255,0)
+
+### Operaciones de Matriz
+- **Inversión**: 255 - pixel (operación elemento a elemento)
+- **Brillo/Contraste**: α=1.5, β=50 (transformación lineal)
+- **Rotación**: 45° usando matriz de transformación
+- **Bitwise AND**: Operación a nivel de bits con máscara binaria
+
+### Análisis Estadístico
+- **Intensidad promedio**: μ = 38.4
+- **Desviación estándar**: σ = 70.3
+- **Rango**: 0 - 255
+- **Distribución**: Análisis de histogramas RGB/HSV comparativo
+
 ## Características Técnicas
 
 ### Operaciones de Matriz

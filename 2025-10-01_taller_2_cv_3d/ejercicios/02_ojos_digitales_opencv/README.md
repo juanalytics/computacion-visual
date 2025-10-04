@@ -92,6 +92,21 @@ El script genera un collage con 12 imágenes mostrando:
 - **Filtros de enfoque**: Análisis de realce vs artefactos
 - **Detección de bordes**: Rendimiento y robustez de cada método
 
+## Resultados Clave
+
+### Métricas Cuantitativas
+- **Picos detectados**: Número de bordes encontrados por cada método
+- **Área de bordes**: Píxeles clasificados como borde
+- **Intensidad promedio**: Valor medio de intensidad en bordes detectados
+- **Comparación de métodos**: Efectividad relativa de cada técnica
+
+### Parámetros Optimizados
+- **Gaussian Blur**: σ=1.0 para suavizado suave
+- **Average Blur**: Kernel 5x5 para suavizado uniforme
+- **Bilateral Blur**: Preserva bordes mientras suaviza
+- **Unsharp Masking**: α=1.5, σ=1.0 para realce balanceado
+- **Canny**: Umbrales 50-150 para detección robusta
+
 ## Características Técnicas
 
 ### Optimizaciones Implementadas
