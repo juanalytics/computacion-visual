@@ -103,7 +103,7 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 **Evidencia:**  
 Comparativas visuales de los canales RGB/HSV/Lab y simulaciones de visión alterada.  
 Reflexión:  
-> El análisis permitió comprender cómo diferentes espacios de color separan la información cromática y luminosa, y cómo las simulaciones de daltonismo evidencian la pérdida de contraste en ciertas gamas. Los efectos de iluminación y temperatura mostraron la sensibilidad del color a las condiciones perceptuales.
+El análisis permitió comprender cómo diferentes espacios de color separan la información cromática y luminosa, y cómo las simulaciones de daltonismo evidencian la pérdida de contraste en ciertas gamas. Los efectos de iluminación y temperatura mostraron la sensibilidad del color a las condiciones perceptuales.
 
 **Código:** [Ver implementación](./ejercicios/10_modelos_color_percepcion/)
 
@@ -129,10 +129,11 @@ Reflexión:
 **Evidencia:**  
 ![versión threejs](gifs/ejercicio_11_threejs.gif)
 ![versión unity](gifs/ejercicio_11_unity.gif)
+
 GIF alternando entre modo de cámara **perspectiva ↔ ortográfica**, mostrando el cambio en profundidad y proporciones al variar FOV/Size para ambas versiones.  
 
 **Reflexión:**  
-> La proyección en perspectiva produce una sensación de profundidad natural, mientras que la ortográfica conserva las proporciones geométricas sin distorsión. La comparación directa permitió visualizar cómo el FOV afecta la percepción espacial.  
+La proyección en perspectiva produce una sensación de profundidad natural, mientras que la ortográfica conserva las proporciones geométricas sin distorsión. La comparación directa permitió visualizar cómo el FOV afecta la percepción espacial.  
 
 **Código:** [Ver implementación](./ejercicios/11_proyecciones_camara/)
 
@@ -153,9 +154,11 @@ GIF alternando entre modo de cámara **perspectiva ↔ ortográfica**, mostrando
 ├── ejercicios/
 │   ├── 02_ojos_digitales_opencv/     # ✅ Completado
 │   ├── 03_segmentacion_umbral_contornos/  # ✅ Completado
-│   └── 04_imagen_matriz_pixeles/     # ✅ Completado
+│   ├── 04_imagen_matriz_pixeles/     # ✅ Completado
+|   ├── 10_modelos_color_percepcion/  # ✅ Completado
+|   └── 11_proyecciones_camara/       # ✅ Completado
 ├── assets/                           # Imágenes de entrada, modelos 3D
-├── resultados/                       # Evidencias animadas por ejercicio
+├── gifs/                       # Evidencias animadas por ejercicio
 └── README.md                         # Este archivo
 ```
 
@@ -172,6 +175,13 @@ python ojos_digitales.py
 
 # O ejecutar notebook interactivo
 jupyter notebook ojos_digitales_interactive.ipynb
+```
+
+### Three.js (React Three Fiber)
+```bash
+# Instalar dependencias
+npm install three @react-three/fiber @react-three/drei leva
+npm run dev
 ```
 
 ## Resumen de Evaluación
@@ -203,6 +213,8 @@ jupyter notebook ojos_digitales_interactive.ipynb
 - **Ejercicio 2**: `comparison_collage.png` + 12 imágenes individuales
 - **Ejercicio 3**: `comparison_segmentation.png` + `segmentacion_proceso.gif`
 - **Ejercicio 4**: `comparison_matrix_operations.png` + `histograms_analysis.png` + 16 imágenes individuales
+- **Ejercicio 10**: 16 imágenes individuales generadas dentro del notebook
+- **Ejercicio 11**: `ejercicio_11_threejs.gif` y `ejercicio_11_unity.png`
 
 ### Métricas Técnicas Logradas
 - **Filtros implementados**: 12 diferentes con parámetros optimizados
@@ -214,3 +226,7 @@ jupyter notebook ojos_digitales_interactive.ipynb
 - OpenCV Documentation: https://docs.opencv.org/
 - NumPy Documentation: https://numpy.org/doc/
 - Matplotlib Documentation: https://matplotlib.org/stable/
+- Three.js Documentation: https://threejs.org/docs/
+- React Three Fiber: https://docs.pmnd.rs/react-three-fiber/getting-started/introduction
+- Unity: https://docs.unity.com/ugs/en-us/manual/overview/manual/getting-started
+
