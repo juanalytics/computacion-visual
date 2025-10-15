@@ -85,6 +85,63 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 - Desafío en la optimización de operaciones vectorizadas con NumPy
 - Mejora futura: implementar operaciones de convolución personalizadas
 
+### Ejercicio 10 — Explorando el Color (RGB, HSV, CIE Lab + Simulaciones) ✅
+**Meta:** Entender efectos de distintos modelos y condiciones de visión.  
+
+**Entorno:** Python + Google Colab.  
+
+**Implementación:**
+- Conversión entre modelos de color: RGB → HSV y RGB → Lab.  
+- Visualización separada de canales individuales (R, G, B, H, S, V, L, a, b).  
+- Simulaciones visuales:
+  - Daltonismo (Protanopía, Deuteranopía) mediante matrices de transformación.  
+  - Condiciones de baja iluminación (ajuste de brillo/contraste).  
+  - Filtros de temperatura de color (cálido/frío).  
+  - Inversión de color y monocromo.  
+- Interfaz interactiva para alternar entre los distintos modos.  
+
+**Evidencia:**  
+Comparativas visuales de los canales RGB/HSV/Lab y simulaciones de visión alterada.  
+Reflexión:  
+El análisis permitió comprender cómo diferentes espacios de color separan la información cromática y luminosa, y cómo las simulaciones de daltonismo evidencian la pérdida de contraste en ciertas gamas. Los efectos de iluminación y temperatura mostraron la sensibilidad del color a las condiciones perceptuales.
+
+**Código:** [Ver implementación](./ejercicios/10_modelos_color_percepcion/)
+
+**Comentarios personales:**  
+- Aprendizaje sobre modelos de color perceptualmente uniformes (Lab).  
+- Desafío: ajustar la conversión y visualización para mantener coherencia tonal.  
+- Mejora futura: incluir simulación de acromatopsia y control deslizante interactivo.  
+
+### Ejercicio 11 — Proyecciones 3D (Perspectiva vs Ortográfica) ✅
+**Meta:** Comparar cámaras y matrices de proyección.  
+
+**Entorno:** Three.js (React Three Fiber) y Unity.  
+
+**Implementación:**
+- Escena con varios objetos 3D a distintas profundidades (cubos, esfera, plano).  
+- Alternancia dinámica entre `<PerspectiveCamera>` y `<OrthographicCamera>`.  
+- Parámetros configurables: FOV (perspectiva) y Size (ortográfica).  
+- OrbitControls para navegación libre.  
+- HUD interactivo con los valores de cámara.  
+- Suelo gris extendido para dar referencia de profundidad.  
+- Implementación del mismo ejercicio en React Three Fiber y en Unity.
+
+**Evidencia:**  
+![versión threejs](gifs/ejercicio_11_threejs.gif)
+![versión unity](gifs/ejercicio_11_unity.gif)
+
+GIF alternando entre modo de cámara **perspectiva ↔ ortográfica**, mostrando el cambio en profundidad y proporciones al variar FOV/Size para ambas versiones.  
+
+**Reflexión:**  
+La proyección en perspectiva produce una sensación de profundidad natural, mientras que la ortográfica conserva las proporciones geométricas sin distorsión. La comparación directa permitió visualizar cómo el FOV afecta la percepción espacial.  
+
+**Código:** [Ver implementación](./ejercicios/11_proyecciones_camara/)
+
+**Comentarios personales:**  
+- Aprendizaje sobre matrices de proyección y su impacto visual.  
+- Desafío: mantener la escala visual coherente al alternar modos.  
+- Mejora futura: incluir interpolación suave entre cámaras y render en paralelo.  
+
 ## Herramientas y Entornos
 - **Python** (opencv-python, numpy, matplotlib, jupyter)
 - **OpenCV** para procesamiento de imágenes
@@ -97,9 +154,11 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 ├── ejercicios/
 │   ├── 02_ojos_digitales_opencv/     # ✅ Completado
 │   ├── 03_segmentacion_umbral_contornos/  # ✅ Completado
-│   └── 04_imagen_matriz_pixeles/     # ✅ Completado
+│   ├── 04_imagen_matriz_pixeles/     # ✅ Completado
+|   ├── 10_modelos_color_percepcion/  # ✅ Completado
+|   └── 11_proyecciones_camara/       # ✅ Completado
 ├── assets/                           # Imágenes de entrada, modelos 3D
-├── resultados/                       # Evidencias animadas por ejercicio
+├── gifs/                       # Evidencias animadas por ejercicio
 └── README.md                         # Este archivo
 ```
 
@@ -116,6 +175,13 @@ python ojos_digitales.py
 
 # O ejecutar notebook interactivo
 jupyter notebook ojos_digitales_interactive.ipynb
+```
+
+### Three.js (React Three Fiber)
+```bash
+# Instalar dependencias
+npm install three @react-three/fiber @react-three/drei leva
+npm run dev
 ```
 
 ## Resumen de Evaluación
@@ -147,6 +213,8 @@ jupyter notebook ojos_digitales_interactive.ipynb
 - **Ejercicio 2**: `comparison_collage.png` + 12 imágenes individuales
 - **Ejercicio 3**: `comparison_segmentation.png` + `segmentacion_proceso.gif`
 - **Ejercicio 4**: `comparison_matrix_operations.png` + `histograms_analysis.png` + 16 imágenes individuales
+- **Ejercicio 10**: 16 imágenes individuales generadas dentro del notebook
+- **Ejercicio 11**: `ejercicio_11_threejs.gif` y `ejercicio_11_unity.png`
 
 ### Métricas Técnicas Logradas
 - **Filtros implementados**: 12 diferentes con parámetros optimizados
@@ -158,3 +226,7 @@ jupyter notebook ojos_digitales_interactive.ipynb
 - OpenCV Documentation: https://docs.opencv.org/
 - NumPy Documentation: https://numpy.org/doc/
 - Matplotlib Documentation: https://matplotlib.org/stable/
+- Three.js Documentation: https://threejs.org/docs/
+- React Three Fiber: https://docs.pmnd.rs/react-three-fiber/getting-started/introduction
+- Unity: https://docs.unity.com/ugs/en-us/manual/overview/manual/getting-started
+
