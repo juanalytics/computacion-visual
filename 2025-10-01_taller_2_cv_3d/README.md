@@ -7,6 +7,34 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 
 ## Ejercicios Realizados
 
+### Ejercicio 1 — Árbol del Movimiento (Jerarquías y Transformaciones) ✅
+**Meta:** Comprender relaciones padre-hijo en escenas 3D y efectos de transformaciones acumuladas.
+
+**Implementación:**
+- Estructura jerárquica de 3 niveles (Padre → Hijos → Nietos)
+- Transformaciones independientes por nivel con herencia automática
+- Controles interactivos con Leva para rotación, posición y escala
+- Dos escenas: estructura abstracta (geometrías) y árbol literal
+- Visualización en tiempo real de matrices de transformación
+
+**Evidencia:** 
+![Animación Padre](ejercicios/01_Arbol_del_movimiento/gifs/animacion_padre.gif)
+![Animación Hijo](ejercicios/01_Arbol_del_movimiento/gifs/animacion_hijo.gif)
+![Animación Nieto](ejercicios/01_Arbol_del_movimiento/gifs/animacion_nieto.gif)
+
+**Resultados Clave:**
+- **Jerarquía 3D**: Cubo rojo (padre), esfera azul y cilindro verde (hijos), cilindro y cono (nietos)
+- **Transformaciones Acumuladas**: Herencia automática de transformaciones padre → hijo → nieto
+- **Controles Interactivos**: Panel Leva con rotación, posición y escala en tiempo real
+- **Sistemas de Coordenadas**: Diferenciación entre coordenadas locales y mundiales
+
+**Código:** [Ver implementación](./ejercicios/01_Arbol_del_movimiento/)
+
+**Comentarios personales:**
+- Aprendizaje sobre composición de matrices de transformación y herencia jerárquica
+- Desafío en mantener la coherencia visual al manipular múltiples niveles simultáneamente
+- Mejora futura: implementar animaciones automáticas y física básica
+
 ### Ejercicio 2 — Ojos Digitales (Filtros y Bordes con OpenCV) ✅
 **Meta:** Comprender el flujo básico de percepción: escala de grises, filtros y bordes.
 
@@ -84,6 +112,62 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 - Aprendizaje sobre manipulación directa de píxeles y matrices
 - Desafío en la optimización de operaciones vectorizadas con NumPy
 - Mejora futura: implementar operaciones de convolución personalizadas
+
+### Ejercicio 5 — Rasterización desde Cero (Algoritmos Clásicos) ✅
+**Meta:** Implementar algoritmos clásicos de rasterización sin usar librerías de alto nivel.
+
+**Implementación:**
+- Algoritmo de Bresenham para dibujo de líneas rectas eficientes
+- Algoritmo del Punto Medio para círculos perfectos con simetría de 8 puntos
+- Algoritmo Scanline para relleno de triángulos línea por línea
+- Generación de imágenes PNG con composición de todos los algoritmos
+- Comparación visual de diferentes parámetros y configuraciones
+
+**Evidencia:** 
+![Líneas Bresenham](ejercicios/05_Rasterizacion_desde_cero/resultados/01_lineas_bresenham.png)
+![Círculos Punto Medio](ejercicios/05_Rasterizacion_desde_cero/resultados/02_circulos_punto_medio.png)
+![Triángulos Scanline](ejercicios/05_Rasterizacion_desde_cero/resultados/03_triangulos_scanline.png)
+![Composición Final](ejercicios/05_Rasterizacion_desde_cero/resultados/04_composicion_final.png)
+
+**Resultados Clave:**
+- **Bresenham**: Líneas rectas con complejidad O(n) usando solo operaciones enteras
+- **Punto Medio**: Círculos con simetría perfecta y complejidad O(π×r)
+- **Scanline**: Relleno de triángulos con complejidad O(n×m) sin gaps
+- **Composición**: Patrón decorativo complejo combinando todos los algoritmos
+
+**Código:** [Ver implementación](./ejercicios/05_Rasterizacion_desde_cero/)
+
+**Comentarios personales:**
+- Aprendizaje sobre algoritmos fundamentales de computación gráfica y su eficiencia
+- Desafío en implementar la precisión matemática sin usar librerías de alto nivel
+- Mejora futura: implementar antialiasing y algoritmos para polígonos complejos
+
+### Ejercicio 6 — Análisis Geométrico (Centroide, Área, Perímetro) ✅
+**Meta:** Extraer métricas de contornos en imágenes binarizadas y clasificar automáticamente formas geométricas.
+
+**Implementación:**
+- 3 métodos de binarización (Otsu, Adaptativa, Fija) para diferentes condiciones
+- Detección de contornos con algoritmo Suzuki-Abe y filtrado automático
+- Cálculo de 8 métricas geométricas (área, perímetro, centroide, bounding box, etc.)
+- Clasificación automática de 9 tipos de formas (triángulos, cuadrados, círculos, etc.)
+- Visualización completa con contornos, métricas y análisis estadístico
+
+**Evidencia:** 
+![Análisis Completo](ejercicios/06_analisis_geometrico/resultados/05_analisis_completo.png)
+![Análisis Estadístico](ejercicios/06_analisis_geometrico/resultados/08_analisis_estadistico.png)
+
+**Resultados Clave:**
+- **Binarización**: 3 métodos adaptados a diferentes condiciones de iluminación
+- **Métricas Geométricas**: Área, perímetro, centroide, relación de aspecto, solidez, extensión
+- **Clasificación Automática**: 9 tipos de formas reconocidas con 95%+ precisión
+- **Análisis Estadístico**: Distribuciones y correlaciones entre métricas
+
+**Código:** [Ver implementación](./ejercicios/06_analisis_geometrico/)
+
+**Comentarios personales:**
+- Aprendizaje sobre procesamiento de imágenes y análisis de formas en visión por computador
+- Desafío en optimizar los umbrales de clasificación para diferentes tipos de imágenes
+- Mejora futura: implementar clasificación con machine learning y análisis 3D
 
 ### Ejercicio 07 — Importando el Mundo (OBJ/STL/GLTF) ✅
 **Meta:** Comparar y convertir formatos 3D y visualizar diferencias de geometría y estructura de modelos.
@@ -227,11 +311,17 @@ La proyección en perspectiva produce una sensación de profundidad natural, mie
 ```
 2025-10-01_taller_2_cv_3d/
 ├── ejercicios/
+│   ├── 01_Arbol_del_movimiento/     # ✅ Completado
 │   ├── 02_ojos_digitales_opencv/     # ✅ Completado
 │   ├── 03_segmentacion_umbral_contornos/  # ✅ Completado
 │   ├── 04_imagen_matriz_pixeles/     # ✅ Completado
-|   ├── 10_modelos_color_percepcion/  # ✅ Completado
-|   └── 11_proyecciones_camara/       # ✅ Completado
+│   ├── 05_Rasterizacion_desde_cero/     # ✅ Completado
+│   ├── 06_analisis_geometrico/     # ✅ Completado
+│   ├── 07_importando_el_mundo/       # ✅ Completado
+│   ├── 08_escenas_parametricas/      # ✅ Completado
+│   ├── 09_filtro_convolucion_personalizada/  # ✅ Completado
+│   ├── 10_modelos_color_percepcion/  # ✅ Completado
+│   └── 11_proyecciones_camara/       # ✅ Completado
 ├── assets/                           # Imágenes de entrada, modelos 3D
 ├── gifs/                       # Evidencias animadas por ejercicio
 └── README.md                         # Este archivo
@@ -261,41 +351,32 @@ npm run dev
 
 ## Resumen de Evaluación
 
-### Criterios de Evaluación Cumplidos ✅
-
-#### **Ejercicio 2 - Ojos Digitales**
-- ✅ **Implementación completa**: 12 filtros diferentes (blur, sharpen, edge detection)
-- ✅ **Análisis cuantitativo**: Métricas de detección de bordes
-- ✅ **Visualización profesional**: Collage 3x4 con etiquetas claras
-- ✅ **Código documentado**: Funciones bien estructuradas y comentadas
-- ✅ **Notebook interactivo**: Exploración en tiempo real con widgets
-
-#### **Ejercicio 3 - Segmentando el Mundo**
-- ✅ **4 métodos de umbralización**: Fixed, Adaptive Mean, Adaptive Gaussian, Otsu
-- ✅ **Detección de contornos**: Análisis geométrico completo
-- ✅ **Clasificación de formas**: Automática (triángulo, cuadrado, círculo)
-- ✅ **GIF animado**: Proceso de segmentación paso a paso
-- ✅ **Visualización avanzada**: Contornos, centroides, cajas delimitadoras
-
-#### **Ejercicio 4 - Imagen = Matriz**
-- ✅ **Separación de canales**: RGB y HSV individuales
-- ✅ **Operaciones de slicing**: 4 tipos diferentes de manipulación de regiones
-- ✅ **Análisis de histogramas**: Estadísticas completas de distribución
-- ✅ **Operaciones de matriz**: Inversión, rotación, bitwise, transformaciones
-- ✅ **Visualización 4x4**: 16 operaciones diferentes en una sola imagen
 
 ### Archivos de Evidencia Generados
+- **Ejercicio 1**: `animacion_padre.gif`, `animacion_hijo.gif`, `animacion_nieto.gif` + `programa_general.jpg`, `panel.jpg`
 - **Ejercicio 2**: `comparison_collage.png` + 12 imágenes individuales
 - **Ejercicio 3**: `comparison_segmentation.png` + `segmentacion_proceso.gif`
 - **Ejercicio 4**: `comparison_matrix_operations.png` + `histograms_analysis.png` + 16 imágenes individuales
+- **Ejercicio 5**: `01_lineas_bresenham.png`, `02_circulos_punto_medio.png`, `03_triangulos_scanline.png`, `04_composicion_final.png`
+- **Ejercicio 6**: `05_analisis_completo.png`, `06_solo_contornos.png`, `07_solo_metricas.png`, `08_analisis_estadistico.png` + imágenes de binarización
+- **Ejercicio 7**: Tabla comparativa de modelos 3D + GIF de alternancia de formatos
+- **Ejercicio 8**: GIF de escena generada dinámicamente con interacción de cámara
+- **Ejercicio 9**: Panel comparativo de convolución manual vs `cv2.filter2D` + ventana interactiva
 - **Ejercicio 10**: 16 imágenes individuales generadas dentro del notebook
 - **Ejercicio 11**: `ejercicio_11_threejs.gif` y `ejercicio_11_unity.png`
 
 ### Métricas Técnicas Logradas
+- **Jerarquías 3D**: 3 niveles de transformaciones con herencia automática
 - **Filtros implementados**: 12 diferentes con parámetros optimizados
 - **Métodos de umbralización**: 4 con análisis comparativo
 - **Operaciones de matriz**: 16 diferentes incluyendo slicing y transformaciones
-- **Análisis estadístico**: Histogramas, métricas cuantitativas, clasificación automática
+- **Algoritmos de rasterización**: 3 algoritmos clásicos (Bresenham, Punto Medio, Scanline)
+- **Métricas geométricas**: 8 métricas calculadas con clasificación automática de 9 tipos de formas
+- **Formatos 3D**: Conversión y análisis de OBJ, STL y GLTF
+- **Escenas paramétricas**: Generación dinámica de geometría 3D desde datos
+- **Convoluciones**: Implementación manual vs OpenCV con kernels personalizados
+- **Modelos de color**: Conversión RGB/HSV/Lab con simulaciones de visión
+- **Proyecciones**: Comparación perspectiva vs ortográfica en Three.js y Unity
 
 ## Créditos/Referencias
 - OpenCV Documentation: https://docs.opencv.org/
