@@ -1,0 +1,80 @@
+import trimesh
+import open3d as o3d
+import numpy as np
+import pandas as pd
+import os
+
+# === Comprobación del directorio actual ===
+print("📂 Directorio actual:", os.getcwd())
+
+# === Archivos a comparar ===
+archivos = {
+    "OBJ (Bunny)": "models/bunny.obj",
+    "STL (Teapot)": "models/Utah_teapot_(solid).stl",
+    "GLTF (Duck)": "models/scene.gltf"
+}
+
+
+def info_trimesh(ruta):
+    """Devuelve información general del modelo con trimesh."""
+    if not os.path.exists(ruta):
+        raise FileNotFoundError(f"No se encontró el archivo: {ruta}")
+
+    m = trimesh.load(ruta)
+
+    # 🔧 Si es una escena (por ejemplo, un GLTF con varias mallas)
+    if isinstance(m, trimesh.Scene):
+        m = trimesh.util.concatenate(m.dump())
+
+    return {
+        "Vértices": len(m.vertices),
+        "Caras": len(m.faces),
+        "Normales": len(m.vertex_normals),
+        "Duplicados": len(m.vertices) - len(np.unique(m.vertices, axis=0)),
+        "Tipo": type(m).__name__
+    }
+
+
+# === Comparación con trimesh ===
+datos = []
+for formato, ruta in archivos.items():
+    try:
+        datos.append({"Formato": formato, **info_trimesh(ruta)})
+    except Exception as e:
+        datos.append({"Formato": formato, "Error": str(e)})
+
+tabla = pd.DataFrame(datos)
+print("\n=== Comparación de Modelos 3D ===")
+print(tabla)
+
+# === Conversión de formatos ===
+print("\n🔄 Exportando bunny.obj como STL y GLTF...")
+bunny_path = "models/bunny.obj"
+
+if os.path.exists(bunny_path):
+    try:
+        m = trimesh.load(bunny_path)
+        m.export("models/bunny_convertido.stl")
+        m.export("models/bunny_convertido.gltf")
+        print("✅ Archivos exportados correctamente:")
+        print(" - models/bunny_convertido.stl")
+        print(" - models/bunny_convertido.gltf")
+    except Exception as e:
+        print("⚠️ Error al convertir el modelo:", e)
+else:
+    print("❌ No se encontró el archivo bunny.obj en la carpeta models/")
+
+# === Vista 3D con Open3D ===
+print("\n🌀 Abriendo vista 3D interactiva...")
+if os.path.exists(bunny_path):
+    try:
+        m_o3d = o3d.io.read_triangle_mesh(bunny_path)
+        m_o3d.compute_vertex_normals()
+        o3d.visualization.draw_geometries(
+            [m_o3d],
+            window_name="Vista 3D - Bunny (Open3D)"
+        )
+    except Exception as e:
+        print("⚠️ Error al abrir la vista 3D:", e)
+else:
+    print("❌ No se puede abrir la vista 3D: bunny.obj no existe.")

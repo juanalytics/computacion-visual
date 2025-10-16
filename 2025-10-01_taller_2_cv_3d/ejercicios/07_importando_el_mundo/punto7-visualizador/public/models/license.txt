@@ -1,0 +1,11 @@
+Model Information:
+* title:	Duck
+* source:	https://sketchfab.com/3d-models/duck-6e039c6c606c4c26a1359514352629fd
+* author:	likangning93 (https://sketchfab.com/likangning93)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Duck" (https://sketchfab.com/3d-models/duck-6e039c6c606c4c26a1359514352629fd) by likangning93 (https://sketchfab.com/likangning93) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
