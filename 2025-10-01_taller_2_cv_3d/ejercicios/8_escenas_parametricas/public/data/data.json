@@ -1,0 +1,5 @@
+[
+  { "tipo": "cubo", "pos": [0, 0, 0], "escala": 1, "color": "#ff5555" },
+  { "tipo": "esfera", "pos": [2, 0, 0], "escala": 0.8, "color": "#55ff55" },
+  { "tipo": "cono", "pos": [-2, 0, 0], "escala": 1.2, "color": "#5555ff" }
+]
