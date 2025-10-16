@@ -1,0 +1,4 @@
+Formato;Vértices;Caras;Normales;Duplicados;Tipo
+OBJ (Bunny);2503;4968;2503;0;Trimesh
+STL (Teapot);4719;9438;4719;0;Trimesh
+GLTF (Duck);7586;9576;7586;3079;Trimesh
