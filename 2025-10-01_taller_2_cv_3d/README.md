@@ -85,6 +85,81 @@ Integrar en un solo taller (multi-módulo) los temas de gráficos 3D y visión p
 - Desafío en la optimización de operaciones vectorizadas con NumPy
 - Mejora futura: implementar operaciones de convolución personalizadas
 
+### Ejercicio 07 — Importando el Mundo (OBJ/STL/GLTF) ✅
+**Meta:** Comparar y convertir formatos 3D y visualizar diferencias de geometría y estructura de modelos.
+
+**Implementación:**
+- **Python:**  
+  - Uso de `trimesh`, `open3d` y `numpy` para cargar modelos OBJ, STL y GLTF.  
+  - Inspección de vértices, caras, normales y duplicados.  
+  - Conversión de formatos (`.obj → .stl` y `.gltf`) con exportación automática.  
+  - Visualización 3D interactiva usando `open3d.visualization.draw_geometries`.
+- **React/Three.js (R3F):**  
+  - Visor interactivo de modelos OBJ, STL y GLTF con `OrbitControls`.  
+  - Ajuste de escala y posicionamiento de modelos al origen automáticamente.  
+  - HUD dinámico mostrando formato actual, número de vértices y caras.  
+  - Selector de formato para alternar entre modelos en tiempo real.  
+
+**Evidencia:**  
+- Tabla comparativa de los modelos 3D (vértices, caras, normales, duplicados).  
+- GIF mostrando la alternancia de formatos y el HUD en funcionamiento.  
+
+**Código:** [Ver implementación](./ejercicios/07_importando_el_mundo/)
+
+**Comentarios personales:**
+- Aprendizaje sobre diferencias en geometría, materiales y estructura entre OBJ, STL y GLTF.  
+- Desafío: mantener consistencia de visualización y escala entre formatos distintos.  
+- Mejora futura: agregar soporte para texturas complejas y animaciones GLTF.
+
+### Ejercicio 08 — Escenas Paramétricas (Objetos desde Datos) ✅
+**Meta:** Generar geometría 3D a partir de arrays o listas de datos, parametrizando posición, escala y color.
+
+**Implementación:**
+
+- **React/Three.js (R3F):**  
+  - Componente que mapea arrays de objetos a `<mesh>` con geometrías (`cubo`, `esfera`, `cono`) y materiales estándar.  
+  - Parámetros aleatorios: posición, rotación, escala y color.  
+  - Botón para regenerar la escena dinámicamente.  
+  - Navegación con `OrbitControls` y visualización de referencia con `gridHelper` y `axesHelper`.
+
+**Evidencia:**  
+- GIF mostrando la escena generada dinámicamente y la interacción con la cámara.  
+
+**Código:** [Ver implementación](./ejercicios/8_escenas_parametricas/)
+
+**Comentarios personales:**
+- Aprendizaje sobre mapeo de datos a geometría 3D y visualización interactiva.  
+- Desafío: mantener coherencia visual y proporciones al generar objetos aleatorios.  
+- Mejora futura: agregar controles deslizantes para modificar propiedades en tiempo real.
+
+### Ejercicio 09 — Filtro Visual (Convoluciones Personalizadas) ✅
+**Meta:** Implementar convoluciones 2D manualmente y comparar resultados con `cv2.filter2D` de OpenCV.
+
+**Entorno:** Python (OpenCV + NumPy)
+
+**Implementación:**
+- Carga de imagen y conversión a escala de grises.
+- Definición de al menos 3 kernels personalizados:
+  - **Blur (Suavizado)**: kernel promedio 3x3
+  - **Sharpen (Nitidez)**: kernel de enfoque
+  - **Bordes (Sobel X)**: detección de bordes verticales
+- Aplicación de convolución manual sobre la imagen.
+- Comparación lado a lado con el resultado de `cv2.filter2D`.
+- **Bonus interactivo:** sliders para modificar manualmente los pesos del kernel.
+
+**Evidencia:**
+- Panel comparativo mostrando, para cada kernel, la imagen procesada con convolución manual a la izquierda y `cv2.filter2D` a la derecha.
+- Ventana interactiva con sliders para experimentar con diferentes pesos del kernel.
+
+**Código:** [Ver implementación](./ejercicios/09_filtro_convolucion_personalizada/)
+
+**Comentarios personales:**
+- Aprendizaje sobre el funcionamiento interno de la convolución 2D.
+- Desafío: asegurar que la normalización y el centrado del kernel produzcan resultados visualmente coherentes.
+- Mejora futura: agregar detección de bordes en múltiples direcciones y filtros dinámicos interactivos.
+
+
+
 ### Ejercicio 10 — Explorando el Color (RGB, HSV, CIE Lab + Simulaciones) ✅
 **Meta:** Entender efectos de distintos modelos y condiciones de visión.  
 
