@@ -1,4 +1,4 @@
-## 3. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
+## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
 - Materiales con texturas dinámicas reactivas al tiempo.
