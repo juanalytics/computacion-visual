@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 3. React Three.js – Shaders & Efectos Interactivos
 
 ## 🎯 Concepto del proyecto
@@ -128,6 +129,8 @@ Este proyecto se inspiró en preguntas como:
 
 ---
 
+=======
+>>>>>>> d99e1e4ed72d500656e1c386f0c937ee545e5117
 ## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
