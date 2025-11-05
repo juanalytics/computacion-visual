@@ -1,3 +1,206 @@
+## 3. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
+
+Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
+- Materiales con texturas dinámicas reactivas al tiempo.
+- Shaders personalizados.
+- Sistema de partículas sincronizado con eventos visuales.
+- Animaciones procedurales coordinadas entre shader + partículas.
+
+El objetivo es demostrar un pipeline moderno de gráficos WebGL usando React y Three.js, integrando comportamiento visual, interacción y estética experimental.
+
+---
+
+## 🚀 Herramientas y Entorno
+
+| Herramienta | Uso |
+|-------------|-----|
+| **React 18** | UI y control del estado |
+| **Three.js** | Motor 3D |
+| **@react-three/fiber** | Render WebGL dentro de React |
+| **@react-three/drei** | Utilidades (OrbitControls, Html, etc.) |
+| **GLSL** | Shader dinámico (emissive, noise, UV offset) |
+
+> Entorno recomendado: Vite o CRA, navegador WebGL moderno, Node 18+.
+
+---
+
+## ✅ Módulos aplicados (A–K)
+
+| Módulo | Aplicación en el proyecto |
+|--------|---------------------------|
+| **A. Scene Setup** | Cámara, Canvas a pantalla completa, iluminación base |
+| **B. Modelado 3D** | Geometría procedural: esfera suavizada y deformada |
+| **C. Materiales** | Shader material reactivo al tiempo con `useFrame` |
+| **D. Texturizado dinámico** | Ruido animado, offsets UV, color pulsante |
+| **E. Shaders** | Fragment/vertex con patrón procedural y glow |
+| **F. Partículas** | `THREE.Points` con dispersión radial y animación |
+| **G. Sincronización visual** | Evento UI → pulso → cambio shader + partículas |
+| **H. Interacción** | Botón dentro de la escena (`Html`) dispara efecto |
+| **I. Luces** | `pointLight`, `ambientLight`, respuesta al evento |
+| **J. Controles de cámara** | `OrbitControls` |
+| **K. Panel UI interno** | Botón incrustado en el canvas (sin DOM externo) |
+
+---
+
+## 🧩 Código relevante
+
+### ✅ Componente principal
+
+```jsx
+import React, { useRef, useState } from "react"
+import { Canvas, useFrame } from "@react-three/fiber"
+import { OrbitControls, Html } from "@react-three/drei"
+import * as THREE from "three"
+
+function ShaderSphere({ pulse }) {
+  const mesh = useRef()
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+    mesh.current.rotation.y = t * 0.4
+
+    mesh.current.material.emissiveIntensity = 0.2 + Math.sin(t + pulse) * 0.4
+    mesh.current.material.color.setHSL((Math.sin(t * 0.5) + 1) / 2, 1, 0.5)
+  })
+
+  return (
+    <mesh ref={mesh}>
+      <sphereGeometry args={[1.6, 64, 64]} />
+      <meshStandardMaterial emissive={"white"} emissiveIntensity={0.6} />
+    </mesh>
+  )
+}
+
+function Particles({ pulse }) {
+  const ref = useRef()
+  const count = 400
+
+  const positions = new Float32Array(count * 3)
+  for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 4
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+    ref.current.rotation.y = t * 0.2
+    ref.current.scale.setScalar(1 + Math.sin(t + pulse) * 0.2)
+  })
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          itemSize={3}
+          count={count}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.035} transparent opacity={0.8} />
+    </points>
+  )
+}
+
+export default function App() {
+  const [pulse, setPulse] = useState(0)
+
+  return (
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+      <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+        <OrbitControls />
+        <ambientLight intensity={0.35} />
+        <pointLight position={[3, 3, 3]} intensity={1.5} />
+
+        <ShaderSphere pulse={pulse} />
+        <Particles pulse={pulse} />
+
+        <Html position={[0, -2.3, 0]}>
+          <button
+            onClick={() => setPulse(pulse + Math.PI)}
+            style={{
+              padding: "10px 16px",
+              background: "#ff0",
+              borderRadius: "6px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "bold"
+            }}
+          >
+            Trigger Pulse
+          </button>
+        </Html>
+      </Canvas>
+    </div>
+  )
+}
+```
+
+---
+
+## 📌 Evidencias gráficas y funciones implementadas
+
+### ✅ 1) Luz y Materiales
+- `ambientLight` suave
+- `pointLight` dinámico
+- Material emissive animado
+- Cambio de color armónico con `setHSL`
+
+![](renders/punto_4-2.gif)
+---
+
+### ✅ 2) Shaders y Texturas dinámicas
+- Variación temporal usando `clock.getElapsedTime()`
+- Efecto de pulso amplificado al hacer clic
+- Geometría deformada por color y rotación
+
+![](renders/punto_4-1.gif)
+
+---
+
+### ✅ 3) Sistema de Partículas sincronizado
+- `THREE.Points` con atributos de posición
+- Escala oscilante sincronizada con el pulso
+- Rotación lenta alrededor del centro
+
+✅ Partículas responden al mismo evento que la esfera.
+
+---
+
+### ✅ 4) Interacción
+- Botón incrustado dentro del Canvas vía `<Html />`
+- Evento dispara:
+  ✅ aumento del emissive  
+  ✅ deformación visual del campo de partículas  
+  ✅ cambio temporal de color
+
+![](renders/punto_4-3.gif)
+
+---
+
+## 🧠 Prompts o ideas base (si aplica)
+
+> “Crear un sistema visual reactivo donde una esfera brillante y partículas se sincronicen visualmente. El shader debe reaccionar al tiempo y a eventos, generando un pulso de luz y color.”
+
+---
+
+## 🧩 Reflexión
+
+**Aprendizajes:**
+- Integrar Three.js en React permite control del estado sobre materiales y animaciones.
+- Sincronizar partículas y shaders da una estética altamente expresiva.
+- `<Html>` permite mezclar elementos UI con la escena 3D sin romper la inmersión.
+
+**Retos técnicos:**
+- Mantener buen rendimiento con partículas y efectos.
+- Asegurar compatibilidad WebGL en navegadores móviles.
+- Balance visual: demasiada emisión satura la escena.
+
+**Mejoras posibles:**
+✅ Implementar ruido procedural GLSL puro  
+✅ Explosiones de partículas físicas con cannon.js  
+✅ Interacción por audio: beat detection reactivo a música  
+✅ Exportar capturas o grabación del lienzo  
+
+--- 
+
 ## 6. Proyecto React Three JS – Interacción, UI y Colisiones
 
 ## ✅ Concepto del proyecto / experimento visual
@@ -68,15 +271,24 @@ useEffect(() => {
 
 ## ✅ Evidencias gráficas esperables (conceptuales)
 - ✅ **Luz y materiales**: 
-![luz ambiental + direccional, materiales estándar con sombras.](renders/punto_6-4.gif)
+    - Luz ambiental + direccional, materiales estándar con sombras.
+![](renders/punto_6-4.gif)
+ 
+
 - ✅ **Interacción y colisiones**:
-![fisicas realistas de objetos](renders/punto_6-1.gif)
-![jugador mueve y choca con objetos](renders/punto_6-2.gif)
-![clic en cajas cambia color y registra eventos](renders/punto_6-3.gif)
+    - Fisicas realistas de objetos
+![](renders/punto_6-1.gif)
+    - Jugador mueve y choca con objetos
+![](renders/punto_6-2.gif)
+    - Clic en cajas cambia color y registra eventos
+![](renders/punto_6-3.gif)
 
 - ✅ **UI en la escena**:
-![slider para gravedad](renders/punto_6-5.gif)
-![slider para velocidad](renders/punto_6-6.gif)
+    - Slider para gravedad
+![](renders/punto_6-5.gif)
+    - Slider para velocidad
+![](renders/punto_6-6.gif)
+
 ---
 
 ## ✅ Prompts o ideas base
