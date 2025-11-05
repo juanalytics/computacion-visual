@@ -1,4 +1,134 @@
-## 3. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
+## 3. React Three.js – Shaders & Efectos Interactivos
+
+## 🎯 Concepto del proyecto
+Este experimento visual explora **shaders personalizados en WebGL** usando React Three Fiber y Three.js.  
+Se integran técnicas de **color por posición**, **toon shading**, **distorsión UV**, **texturizado procedural** y **reacciones a interacción del usuario** (hover/click), creando un pequeño laboratorio de efectos gráficos en tiempo real.
+
+El objetivo principal es entender cómo **GLSL controla la apariencia y comportamiento de los materiales**, permitiendo construir superficies animadas, estilizadas o basadas en ruido procedural.
+
+---
+
+## 🧩 Herramientas y entorno utilizado
+| Herramienta | Rol |
+|-------------|-----|
+| **React** | Interfaz y componentes |
+| **React Three Fiber** | Render 3D con Three.js dentro de React |
+| **Three.js** | Motor de render, geometrías, materiales, cámaras y luces |
+| **GLSL (WebGL Shaders)** | Sombras, texturas dinámicas, distorsión y toon shading |
+| **JavaScript + Vite / CRA** | Entorno de desarrollo y bundling |
+| **Drei** | Helpers: OrbitControls, luces, geometrías y utilidades |
+
+---
+
+## 🧱 Módulos aplicados (A–K)
+
+| Letra | Módulo | Implementación en el proyecto |
+|-------|--------|-------------------------------|
+| **A** | Colores por posición | Plano con color basado en coordenadas del vértice y tiempo |
+| **B** | Toon shading | Esfera con bandas de luz estilizada + rim light |
+| **C** | Gradientes y wireframe | Overlay wireframe sobre el shader toon |
+| **D** | Distorsión UV | Caja con ruido procedural y desplazamiento dinámico |
+| **E** | Mezcla de mapas dinámicos | Caja mezcla 2 mapas generados por ruido |
+| **F** | Interacción | Hover = brillo/iluminación, Click = inversión de colores |
+| **G** | Shader programable | Uso directo de ShaderMaterial con uniforms actualizados por `useFrame` |
+| **H** | Tiempo real animado | `uTime` controla oscilaciones, ruido, iluminación |
+| **I** | Iluminación con presets | Luz direccional móvil; ambientLight global |
+| **J** | Cámara y navegación | OrbitControls con damping y stats |
+| **K** | Limpieza | Disposición de materiales para evitar memory leaks |
+
+---
+
+## 📌 Código relevante
+### Shader Toon (fragmento)
+```glsl
+float lambert = dot(N, L);
+float bands = floor(lambert * 4.0) / 4.0; // pasos tipo cartoon
+float rim = pow(1.0 - max(0.0, dot(N, normalize(-L))), 2.0) * 0.25;
+col = uBaseColor * (0.2 + 0.9 * bands) + rim;
+```
+
+### Distorsión UV con ruido procedural
+```glsl
+uv += 0.06 * noise(uv * 3.0 + uTime * 0.6);
+float mapA = smoothstep(-0.1, 0.1, sin((uv.x + uv.y * 1.3) * 10.0 + uTime));
+float mapB = smoothstep(0.0, 0.6, noise(uv * 4.0));
+final = mix(colA, colB, 0.5 + 0.5 * sin(uTime*0.7 + vPos.y*2.0));
+```
+
+### Interacción en React
+```jsx
+<mesh
+  onPointerEnter={() => setHover(true)}
+  onPointerLeave={() => setHover(false)}
+  onClick={() => setClicked(v => !v)}
+/>
+```
+
+---
+
+## 🖼️ Evidencias gráficas (lo que debe verse)
+
+✅ **1. Luz y materiales con presets distintos**
+- AmbientLight + luz direccional móvil
+- Toon shading con bandas estilizadas y wireframe opcional
+- Superficie animada por posición
+![](renders/punto_3-1.gif)
+
+
+✅ **2. Modelado procedural y shaders dinámicos**
+- Caja con ruido, mezcla de texturas y distorsión UV
+![](renders/punto_3-4.gif)
+- Plano con colores que reaccionan al tiempo y a la posición del mouse
+![](renders/punto_3-3.gif)
+
+✅ **3. Interacción por gestos (mouse)**
+- Hover → brillo, cambios de color, iluminación
+![](renders/punto_3-5.gif)
+- Click → inversión de colores completa
+![](renders/punto_3-2.gif)
+
+
+✅ **4. Visualización 360°**
+- La cámara orbita y puede visitar toda la escena como una inspección interactiva
+![](renders/punto_3-6.gif)
+
+✅ **5. (Opcional / Simulado) Respuestas EEG o señales externas**
+- Podría mapearse a `uniforms` como `uBrainwave` o `uPulse` y distorsionar geometrías
+
+---
+
+## 💡 Prompts o ideas base
+Este proyecto se inspiró en preguntas como:
+- “¿Qué pasa si en lugar de usar texturas importadas generamos patrones con ruido?”
+- “¿Cómo se vería un toon shader sin usar MeshToonMaterial?”
+- “¿Podemos cambiar la apariencia visual con interacción del usuario?”
+- “¿Qué tan lejos llega un shader solo con posición, tiempo y ruido?”
+
+---
+
+## 🧠 Reflexión: aprendizajes, retos y mejoras
+
+### ✅ Aprendizajes obtenidos
+- Entender la relación entre `vertexShader`, `fragmentShader`, `uniforms` y `useFrame`
+- Cómo pasar datos del mundo React al GPU
+- Depurar shaders en tiempo real
+- Controlar interactividad con WebGL sin perder FPS
+
+### ⚠️ Retos técnicos
+- Si no se enlazan correctamente los materiales con `useRef`, los uniforms no actualizan
+- OrbitControls consume eventos de mouse y puede interferir con el hover
+- El ruido procedural puede bajar FPS en móviles si la geometría es densa
+
+### 🚀 Mejoras futuras
+- Outline dinámico al seleccionar
+- Control por voz o hand tracking vía WebSpeech/MediaPipe
+- GUI para modificar parámetros del shader
+- Exportar la escena como GIF o video
+- Integrar un modelo neuronal simple que controle colores o distorsión
+
+---
+
+## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
 - Materiales con texturas dinámicas reactivas al tiempo.
