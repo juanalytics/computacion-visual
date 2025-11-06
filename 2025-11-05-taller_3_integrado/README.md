@@ -520,6 +520,332 @@ static createWave(amplitude, frequency, time = 0) {
 
 ---
 
+## 3. Proyecto: Shaders Personalizados GLSL con React Three Fiber
+
+### ✅ Concepto del proyecto o experimento visual
+
+Este proyecto implementa un playground de shaders personalizados utilizando React Three Fiber y GLSL, demostrando diferentes técnicas de shader programming y su integración con interacción del usuario. El objetivo es mostrar cómo crear efectos visuales avanzados mediante shaders personalizados escritos directamente en GLSL.
+
+El experimento visual incluye:
+- **Shaders procedurales**: Efectos generados mediante funciones matemáticas y tiempo
+- **Shader Toon**: Iluminación estilizada con bandas de color y rim lighting
+- **Shader interactivo**: Efectos que responden a hover y click del usuario
+- **Deformación de vértices**: Modificación de geometría en tiempo real mediante vertex shaders
+- **Ruido procedural**: Generación de patrones mediante funciones de ruido en fragment shader
+- **Interacción reactiva**: Estados de hover y click que modifican los shaders en tiempo real
+
+El sistema permite explorar cómo los shaders personalizados pueden crear efectos visuales únicos e interactivos que no son posibles con materiales estándar.
+
+---
+
+### 🚀 Herramientas y entorno usado
+
+| Herramienta | Uso |
+|-------------|-----|
+| **React** | Framework UI para componentes |
+| **Vite** | Build tool y servidor de desarrollo |
+| **@react-three/fiber** | Renderizado de Three.js en React |
+| **@react-three/drei** | Utilidades (OrbitControls, Stats) |
+| **Three.js** | Motor 3D WebGL |
+| **GLSL** | Lenguaje de shaders para vertex y fragment shaders |
+| **ShaderMaterial** | Material personalizado con shaders GLSL |
+
+> Entorno: Node.js 18+, navegador moderno con soporte WebGL, Vite para desarrollo.
+
+---
+
+### ✅ Descripción de los módulos aplicados (A–K)
+
+| Módulo | Aplicación en el proyecto |
+|--------|---------------------------|
+| **A. Scene Setup** | Configuración de Canvas, cámara, luces (ambient y directional) |
+| **B. Modelado 3D** | Geometrías: plano (ground), esfera, cubo con alta resolución |
+| **C. Materiales** | `ShaderMaterial` personalizado con shaders GLSL escritos desde cero |
+| **D. Texturizado dinámico** | Texturas procedurales generadas mediante shaders (no texturas de imagen) |
+| **E. Shaders** | Vertex y fragment shaders GLSL personalizados con múltiples técnicas |
+| **F. Partículas** | No aplicado en este proyecto |
+| **G. Sincronización visual** | Actualización de uniforms en cada frame mediante `useFrame` |
+| **H. Interacción** | Eventos `onPointerEnter`, `onPointerLeave`, `onClick` que modifican shaders |
+| **I. Luces** | Sistema de iluminación básico (ambient + directional) para shader toon |
+| **J. Controles de cámara** | `OrbitControls` con damping para navegación suave |
+| **K. Panel UI interno** | Overlay de texto con instrucciones de interacción |
+
+---
+
+### 🧩 Código relevante o fragmentos clave
+
+#### ✅ Shader Procedural con Tiempo y Mouse
+
+```javascript
+const frag_pos_time = `
+precision highp float;
+uniform float uTime;
+uniform vec2 uMouse;
+varying vec2 vUv;
+varying vec3 vPosition;
+vec3 palette(float t){
+  return vec3(0.5 + 0.5*cos(6.2831*(t+vec3(0.0,0.33,0.66))));
+}
+void main(){
+  float height = (vPosition.y + 1.0) * 0.5;
+  float stripe = sin((vPosition.x + uTime*0.8) * 6.0);
+  float t = clamp(height + 0.25*stripe, 0.0, 1.0);
+  vec2 m = uMouse - vUv;
+  float dist = length(m);
+  float glow = smoothstep(0.2, 0.0, dist);
+  vec3 col = palette(t + 0.2*sin(uTime*0.6));
+  col += vec3(1.0,0.6,0.1) * glow * 0.6;
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+// Uso en componente
+const material = useMemo(() => {
+  return new THREE.ShaderMaterial({
+    vertexShader: vertex_common,
+    fragmentShader: frag_pos_time,
+    uniforms: {
+      uTime: { value: 0 },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) }
+    },
+    side: THREE.DoubleSide
+  });
+}, []);
+
+useFrame(({ clock }) => {
+  if (materialRef.current) {
+    materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+    materialRef.current.uniforms.uMouse.value.set(...mouse.current);
+  }
+});
+```
+
+#### ✅ Shader Toon con Iluminación Estilizada
+
+```javascript
+const frag_toon = `
+precision highp float;
+uniform vec3 uLightPos;
+uniform vec3 uBaseColor;
+uniform float uHover;
+varying vec3 vNormal;
+varying vec3 vWorldPos;
+void main(){
+  vec3 N = normalize(vNormal);
+  vec3 L = normalize(uLightPos - vWorldPos);
+  float lambert = dot(N,L);
+  float bands = floor(lambert * 4.0) / 4.0;
+  bands = clamp(bands, 0.05, 1.0);
+  float rim = pow(1.0 - max(0.0, dot(N, normalize(-L))), 2.0) * 0.25;
+  vec3 col = uBaseColor * (0.2 + 0.9 * bands) + rim;
+  col += vec3(1.0,0.8,0.3) * uHover * 0.7;
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+// Componente con interacción
+function ToonSphere() {
+  const [hover, setHover] = useState(false);
+  
+  useFrame(() => {
+    if (materialRef.current) {
+      const t = performance.now() * 0.001;
+      materialRef.current.uniforms.uLightPos.value.set(
+        Math.sin(t)*5, 3 + Math.cos(t)*2, 2
+      );
+      materialRef.current.uniforms.uHover.value = hover ? 1.0 : 0.0;
+    }
+  });
+
+  return (
+    <mesh
+      onPointerEnter={(e) => { e.stopPropagation(); setHover(true); }}
+      onPointerLeave={(e) => { e.stopPropagation(); setHover(false); }}
+    >
+      <sphereGeometry args={[1, 64, 64]} />
+    </mesh>
+  );
+}
+```
+
+#### ✅ Shader con Deformación de Vértices y Ruido
+
+```javascript
+const vert_uv_dist = `
+precision highp float;
+varying vec2 vUv;
+varying vec3 vPos;
+uniform float uTime;
+void main(){
+  vUv = uv;
+  vPos = position;
+  vec3 pos = position;
+  pos.z += 0.05 * sin(uTime + position.x * 4.0) * sin(uTime*0.5 + position.y * 3.0);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+}
+`;
+
+const frag_uv_dist = `
+precision highp float;
+uniform float uTime;
+uniform float uHover;
+uniform float uClick;
+varying vec2 vUv;
+varying vec3 vPos;
+float noise(vec2 p){
+  float n=0.0;
+  n += 0.5 * sin(p.x*3.0 + p.y*2.1 + uTime*1.1);
+  n += 0.25 * sin(p.x*7.0 - p.y*4.2 + uTime*1.7);
+  n += 0.12 * sin(p.x*12.0 + p.y*9.0 + uTime*2.3);
+  return n;
+}
+void main(){
+  vec2 uv = vUv;
+  uv += 0.06 * noise(uv * 3.0 + uTime*0.6);
+  float mapA = smoothstep(-0.1, 0.1, sin((uv.x+uv.y*1.3)*10.0 + uTime*1.3));
+  float mapB = smoothstep(0.0, 0.6, noise(uv*4.0));
+  vec3 colA = vec3(0.9, 0.4, 0.2) * mapA;
+  vec3 colB = vec3(0.2, 0.4, 0.9) * mapB;
+  vec3 final = mix(colA, colB, 0.5 + 0.5*sin(uTime*0.7 + vPos.y*2.0));
+  final += vec3(0.8,0.7,0.1) * uHover * 0.6;
+  if(uClick > 0.5){
+    final = vec3(1.0) - final;
+  }
+  gl_FragColor = vec4(final, 1.0);
+}
+`;
+
+// Componente con hover y click
+function ProceduralBox() {
+  const [hover, setHover] = useState(false);
+  const [clicked, setClicked] = useState(false);
+
+  useFrame(({ clock }) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+      materialRef.current.uniforms.uHover.value = hover ? 1.0 : 0.0;
+      materialRef.current.uniforms.uClick.value = clicked ? 1.0 : 0.0;
+    }
+  });
+
+  return (
+    <mesh
+      onPointerEnter={(e) => { e.stopPropagation(); setHover(true); }}
+      onPointerLeave={(e) => { e.stopPropagation(); setHover(false); }}
+      onClick={(e) => { e.stopPropagation(); setClicked(v => !v); }}
+    >
+      <boxGeometry args={[1.6, 1.6, 1.6, 64, 64, 64]} />
+    </mesh>
+  );
+}
+```
+
+#### ✅ Hook Personalizado para Mouse Global
+
+```javascript
+function useMouseGlobal() {
+  const mouse = useRef([0.5, 0.5]);
+  useEffect(() => {
+    const onMove = (e) => {
+      mouse.current = [
+        e.clientX / window.innerWidth, 
+        1.0 - e.clientY / window.innerHeight
+      ];
+    };
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
+  return mouse;
+}
+```
+
+#### ✅ Gestión de Materiales y Cleanup
+
+```javascript
+const material = useMemo(() => {
+  return new THREE.ShaderMaterial({
+    vertexShader: vertex_common,
+    fragmentShader: frag_pos_time,
+    uniforms: {
+      uTime: { value: 0 },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) }
+    }
+  });
+}, []);
+
+useEffect(() => {
+  materialRef.current = material;
+  return () => {
+    material.dispose(); // Limpieza de recursos
+  };
+}, [material]);
+```
+
+---
+
+### 📌 Evidencias gráficas
+
+#### ✅ Escena completa
+
+![Escena Completa](renders/punto3_escena_completa.gif)
+
+#### ✅ Modelado procedural y shaders dinámicos
+
+- **Shader procedural con paleta de colores**: Generación de colores mediante funciones trigonométricas y tiempo
+- **Efecto de glow interactivo**: Resplandor que sigue la posición del mouse
+- **Shader toon con iluminación animada**: Luz que se mueve en círculo con efecto de bandas de color
+- **Rim lighting**: Efecto de borde brillante en el shader toon
+- **Deformación de vértices**: Ondas sinusoidales que deforman la geometría en tiempo real
+- **Ruido procedural**: Patrones generados mediante múltiples capas de funciones seno
+- **Mezcla de colores dinámica**: Transición entre colores basada en posición y tiempo
+
+#### ✅ Interacción por voz, gestos o colisiones
+
+- **Interacción con hover**: Efectos visuales que responden al hover del mouse
+- **Interacción con click**: Inversión de colores al hacer click en objetos
+- **Tracking de mouse global**: Posición del mouse afecta efectos de glow en el ground
+- **Estados reactivos**: Uso de `useState` para controlar uniforms de shaders
+
+---
+
+### 🧠 Prompts o ideas base
+
+> "Crear un playground de shaders personalizados que demuestre diferentes técnicas de shader programming: efectos procedurales, iluminación estilizada, deformación de vértices y ruido. El sistema debe ser interactivo, permitiendo que el usuario modifique los efectos mediante hover y click, mostrando cómo los shaders pueden crear efectos visuales únicos e imposibles de lograr con materiales estándar."
+
+---
+
+### 🧩 Reflexión: aprendizajes, retos técnicos y mejoras posibles
+
+**Aprendizajes:**
+- Los shaders GLSL permiten control total sobre el pipeline de renderizado
+- Las funciones procedurales (seno, coseno, ruido) pueden generar patrones complejos
+- La deformación de vértices en vertex shader permite animación de geometría sin modificar buffers
+- Los uniforms permiten comunicación bidireccional entre JavaScript y shaders
+- La gestión de memoria es crucial: siempre limpiar materiales con `dispose()`
+- Los shaders personalizados ofrecen rendimiento superior a efectos basados en CPU
+
+**Retos técnicos:**
+- Escribir shaders GLSL correctamente sin errores de sintaxis (difícil de debuggear)
+- Sincronizar uniforms entre React state y shaders en cada frame
+- Manejar correctamente la limpieza de recursos para evitar memory leaks
+- Optimizar shaders para mantener 60 FPS con múltiples objetos
+- Coordinar múltiples uniforms (tiempo, mouse, hover, click) sin conflictos
+- Entender el sistema de coordenadas y transformaciones en shaders
+
+**Mejoras posibles:**
+- ✅ Implementar editor de shaders en tiempo real con hot reload
+- ✅ Agregar más tipos de shaders (water, fire, glass, etc.)
+- ✅ Implementar sistema de post-processing con shaders
+- ✅ Agregar exportación de shaders a archivos GLSL
+- ✅ Crear biblioteca de shaders reutilizables
+- ✅ Implementar sistema de parámetros ajustables para shaders
+- ✅ Agregar visualización de normales y wireframe para debugging
+- ✅ Implementar shaders de partículas procedurales
+- ✅ Agregar soporte para texturas en shaders personalizados
+- ✅ Crear sistema de transiciones entre diferentes shaders
+
+---
+
 ## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
@@ -721,7 +1047,325 @@ export default function App() {
 ✅ Interacción por audio: beat detection reactivo a música  
 ✅ Exportar capturas o grabación del lienzo  
 
---- 
+---
+
+## 5. Proyecto: Visualizador 360° - Panoramas y Videos Inmersivos
+
+### ✅ Concepto del proyecto o experimento visual
+
+Este proyecto implementa un visualizador 360° completo que permite explorar imágenes y videos panorámicos en formato equirectangular. El objetivo es crear una experiencia inmersiva donde el usuario puede navegar libremente dentro de un entorno 360° mediante diferentes métodos de control.
+
+El experimento visual incluye:
+- **Esfera invertida (skybox)**: Geometría esférica invertida para visualizar panoramas desde el interior
+- **Video 360° dinámico**: Soporte para video panorámico que se actualiza en tiempo real como textura
+- **Conmutación entre escenas**: Sistema de múltiples panoramas/escenas con cambio dinámico
+- **Controles múltiples**: Orbit controls, navegación por teclado, y soporte para giroscopio en dispositivos móviles
+- **Carga de archivos locales**: Sistema para cargar imágenes y videos 360° directamente desde el sistema de archivos
+- **Sistema de caché inteligente**: Almacenamiento de contenido por escena para evitar recargas innecesarias
+
+El sistema permite explorar contenido 360° de manera interactiva, ya sea desde archivos locales o escenas predefinidas, con una experiencia fluida y sin interrupciones.
+
+---
+
+### 🚀 Herramientas y entorno usado
+
+| Herramienta | Uso |
+|-------------|-----|
+| **Three.js** | Motor 3D WebGL para renderizado |
+| **OrbitControls** | Controles de cámara interactivos |
+| **WebGL** | Renderizado acelerado por GPU |
+| **DeviceOrientation API** | Acceso a giroscopio en dispositivos móviles |
+| **File API** | Lectura de archivos desde el sistema local |
+| **URL.createObjectURL()** | Creación de URLs temporales para archivos locales |
+| **VideoTexture** | Textura dinámica para videos 360° |
+
+> Entorno: Navegador moderno con soporte WebGL, servidor HTTP local (Python http.server o Node.js http-server).
+
+---
+
+### ✅ Descripción de los módulos aplicados (A–K)
+
+| Módulo | Aplicación en el proyecto |
+|--------|---------------------------|
+| **A. Scene Setup** | Configuración de escena, renderer WebGL, cámara perspectiva centrada |
+| **B. Modelado 3D** | Esfera invertida (skybox) con geometría escalada negativamente para vista interior |
+| **C. Materiales** | `MeshBasicMaterial` con textura equirectangular y mapeo `EquirectangularReflectionMapping` |
+| **D. Texturizado dinámico** | Texturas de imagen estática y `VideoTexture` para video 360° que se actualiza en cada frame |
+| **E. Shaders** | Material básico de Three.js con mapeo equirectangular |
+| **F. Partículas** | No aplicado en este proyecto |
+| **G. Sincronización visual** | Actualización de `VideoTexture` en cada frame del loop de animación |
+| **H. Interacción** | Panel de control HTML con selectores de escena, carga de archivos, controles de video y giroscopio |
+| **I. Luces** | No se requieren luces (material básico sin iluminación) |
+| **J. Controles de cámara** | `OrbitControls` con rotación invertida, zoom limitado, y soporte para giroscopio |
+| **K. Panel UI interno** | Panel de control flotante con carga de archivos, selector de escenas, controles de video y giroscopio |
+
+---
+
+### 🧩 Código relevante o fragmentos clave
+
+#### ✅ Creación de Esfera Invertida (Skybox)
+
+```javascript
+createSphere() {
+    // Crear geometría de esfera (invertida para skybox)
+    const geometry = new THREE.SphereGeometry(500, 60, 40);
+    // Invertir las caras para que la textura se vea desde dentro
+    geometry.scale(-1, 1, 1);
+
+    // Material inicial (se actualizará con texturas)
+    const material = new THREE.MeshBasicMaterial({
+        side: THREE.DoubleSide
+    });
+
+    this.sphere = new THREE.Mesh(geometry, material);
+    this.scene.add(this.sphere);
+}
+```
+
+#### ✅ Video 360° como Textura Dinámica
+
+```javascript
+loadVideo(videoPath) {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.crossOrigin = 'anonymous';
+        video.loop = true;
+        video.muted = false;
+        video.playsInline = true;
+        
+        video.addEventListener('loadeddata', () => {
+            const texture = new THREE.VideoTexture(video);
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            
+            this.sphere.material.map = texture;
+            this.currentTexture = texture;
+            this.currentVideo = video;
+            
+            // Intentar reproducir automáticamente
+            video.play().catch(e => console.log('Autoplay bloqueado:', e));
+            
+            resolve();
+        });
+        
+        video.src = videoPath;
+        video.load();
+    });
+}
+```
+
+#### ✅ Carga de Archivos Locales
+
+```javascript
+loadImageFromFile(file) {
+    const imageUrl = URL.createObjectURL(file);
+    const loader = new THREE.TextureLoader();
+    
+    loader.load(imageUrl, (texture) => {
+        // Configurar textura equirectangular
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        
+        this.sphere.material.map = texture;
+        this.currentTexture = texture;
+        this.sphere.material.needsUpdate = true;
+        
+        // Guardar en caché
+        this.saveCurrentImageToCache();
+        
+        // Mostrar información del archivo
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        document.getElementById('file-info').textContent = 
+            `✓ ${file.name} (${fileSize} MB)`;
+        
+        // Liberar URL del objeto después de cargar
+        URL.revokeObjectURL(imageUrl);
+    });
+}
+
+loadVideoFromFile(file) {
+    const videoUrl = URL.createObjectURL(file);
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.loop = true;
+    video.muted = false;
+    video.playsInline = true;
+    video._objectUrl = videoUrl; // Guardar referencia para limpieza
+    
+    video.addEventListener('loadeddata', () => {
+        const texture = new THREE.VideoTexture(video);
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        
+        this.sphere.material.map = texture;
+        this.currentTexture = texture;
+        this.currentVideo = video;
+        this.isVideoMode = true;
+        
+        // Guardar en caché
+        this.saveCurrentVideoToCache();
+        
+        // Mostrar información del archivo
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        document.getElementById('file-info').textContent = 
+            `✓ ${file.name} (${fileSize} MB)`;
+        
+        // Intentar reproducir
+        video.play().catch(e => console.log('Autoplay bloqueado:', e));
+        
+        this.updateUI();
+    });
+    
+    video.src = videoUrl;
+    video.load();
+}
+```
+
+#### ✅ Sistema de Caché por Escena
+
+```javascript
+saveCurrentImageToCache() {
+    // Guardar la imagen actual en caché antes de cambiar de escena
+    if (this.currentTexture && !this.isVideoMode && this.currentSceneKey && !this.currentVideo) {
+        const fileInfoText = document.getElementById('file-info').textContent;
+        const hasLocalFile = fileInfoText.includes('✓');
+        
+        this.imageCache[this.currentSceneKey] = {
+            texture: this.currentTexture,
+            imageUrl: null,
+            isLocal: hasLocalFile,
+            fileName: hasLocalFile ? fileInfoText : null
+        };
+    }
+}
+
+restoreImageFromCache(sceneKey) {
+    const cached = this.imageCache[sceneKey];
+    if (!cached) return;
+
+    // Restaurar imagen desde caché
+    this.currentTexture = cached.texture;
+    this.sphere.material.map = cached.texture;
+    this.sphere.material.needsUpdate = true;
+
+    // Actualizar información de archivo si era local
+    if (cached.fileName) {
+        document.getElementById('file-info').textContent = cached.fileName;
+    }
+}
+```
+
+#### ✅ Soporte para Giroscopio
+
+```javascript
+handleDeviceOrientation(e) {
+    if (!this.isGyroEnabled) return;
+
+    const euler = new THREE.Euler(
+        THREE.MathUtils.degToRad(e.beta),   // Pitch
+        THREE.MathUtils.degToRad(e.alpha),   // Yaw
+        -THREE.MathUtils.degToRad(e.gamma),  // Roll
+        'YXZ'
+    );
+    
+    this.gyroQuaternion.setFromEuler(euler);
+    this.camera.quaternion.copy(this.gyroQuaternion);
+}
+
+toggleGyroscope() {
+    this.isGyroEnabled = !this.isGyroEnabled;
+    
+    if (this.isGyroEnabled) {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', (e) => this.handleDeviceOrientation(e));
+                    }
+                });
+        } else {
+            window.addEventListener('deviceorientation', (e) => this.handleDeviceOrientation(e));
+        }
+    } else {
+        window.removeEventListener('deviceorientation', this.handleDeviceOrientation);
+    }
+    
+    this.updateUI();
+}
+```
+
+#### ✅ Orbit Controls Configurados para 360°
+
+```javascript
+this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+this.controls.enableDamping = true;
+this.controls.dampingFactor = 0.05;
+this.controls.enableZoom = true;
+this.controls.minDistance = 0.1;
+this.controls.maxDistance = 2;
+this.controls.rotateSpeed = -0.5; // Invertir para movimiento natural
+```
+
+---
+
+### 📌 Evidencias gráficas
+
+#### ✅ Visualizaciones 360° o respuestas EEG simuladas
+
+- **Esfera invertida con textura equirectangular**: Visualización de panoramas 360° desde el interior de una esfera
+- **Video 360° dinámico**: Reproducción de video panorámico como textura que se actualiza en tiempo real
+- **Conmutación entre escenas**: Cambio fluido entre diferentes panoramas/escenas con sistema de caché
+- **Controles múltiples**: Navegación mediante mouse (OrbitControls), teclado (WASD/flechas), y giroscopio en móviles
+- **Carga de archivos locales**: Sistema para cargar imágenes y videos 360° directamente desde el sistema de archivos
+
+#### ✅ Interacción por voz, gestos o colisiones
+
+- **Panel de control interactivo**: Selector de escenas, carga de archivos, controles de video (play/pause, mute)
+- **Navegación por teclado**: Controles WASD/flechas para rotar la vista, R para reset de cámara
+- **Giroscopio en móviles**: Soporte para control mediante orientación del dispositivo
+- **Sistema de caché inteligente**: Almacenamiento de contenido por escena para evitar recargas
+
+---
+
+### 🧠 Prompts o ideas base
+
+> "Crear un visualizador 360° completo que permita explorar imágenes y videos panorámicos de manera inmersiva. El sistema debe soportar múltiples métodos de control (mouse, teclado, giroscopio), carga de archivos locales, y un sistema de caché que permita cambiar entre escenas sin perder el contenido cargado."
+
+---
+
+### 🧩 Reflexión: aprendizajes, retos técnicos y mejoras posibles
+
+**Aprendizajes:**
+- La esfera invertida (skybox) es la técnica estándar para visualizar panoramas 360° desde el interior
+- El mapeo `EquirectangularReflectionMapping` es esencial para proyectar correctamente imágenes equirectangulares
+- `VideoTexture` permite usar video como textura dinámica que se actualiza en cada frame
+- `URL.createObjectURL()` es crucial para cargar archivos locales sin necesidad de servidor de archivos
+- El sistema de caché mejora significativamente la experiencia del usuario al cambiar entre escenas
+- El giroscopio requiere permisos explícitos en algunos navegadores y dispositivos
+
+**Retos técnicos:**
+- Manejar correctamente la limpieza de memoria al cambiar entre videos e imágenes
+- Implementar sistema de caché que preserve el estado de videos (posición, play/pause)
+- Gestionar permisos de giroscopio en diferentes navegadores y dispositivos
+- Evitar memory leaks al usar `URL.createObjectURL()` con múltiples archivos
+- Sincronizar la actualización de `VideoTexture` con el loop de renderizado
+- Manejar casos donde el autoplay de video está bloqueado por el navegador
+
+**Mejoras posibles:**
+- ✅ Implementar sistema de miniaturas para previsualizar escenas
+- ✅ Agregar soporte para múltiples formatos de proyección (cubemap, fisheye)
+- ✅ Implementar sistema de marcadores/hotspots interactivos dentro del panorama
+- ✅ Agregar soporte para audio espacial 360°
+- ✅ Implementar sistema de grabación de recorridos virtuales
+- ✅ Agregar modo de comparación lado a lado de diferentes panoramas
+- ✅ Implementar sistema de anotaciones y comentarios en panoramas
+- ✅ Agregar soporte para streaming de video 360° desde servidor
+- ✅ Implementar sistema de medición de distancias dentro del panorama
+
+---
 
 ## 6. Proyecto React Three JS – Interacción, UI y Colisiones
 
