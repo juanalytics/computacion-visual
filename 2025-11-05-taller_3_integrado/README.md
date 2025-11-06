@@ -1,3 +1,227 @@
+## 1. Proyecto: Materiales PBR, Iluminación y Análisis de Color
+
+### ✅ Concepto del proyecto o experimento visual
+
+Este proyecto implementa un sistema completo de renderizado 3D con materiales PBR (Physically Based Rendering) utilizando Three.js. El objetivo es demostrar:
+
+- **Materiales PBR realistas**: Control de albedo, roughness, metalness y normal maps procedurales
+- **Sistema de iluminación múltiple**: Key light, fill light, rim light y HDRI environment mapping
+- **Análisis de color avanzado**: Conversión entre espacios cromáticos (RGB, HSV, CIELAB) y cálculo de contraste
+- **Control de cámaras**: Alternancia entre proyección perspectiva y ortográfica
+- **Animaciones procedurales**: Variación dinámica de propiedades de material e iluminación
+
+El experimento visual permite explorar cómo diferentes configuraciones de material, iluminación y color afectan la percepción visual de objetos 3D en tiempo real.
+
+---
+
+### 🚀 Herramientas y entorno usado
+
+| Herramienta | Uso |
+|-------------|-----|
+| **Three.js v0.160.0** | Motor 3D WebGL para renderizado |
+| **ES6 Modules** | Sistema de módulos moderno |
+| **Vanilla JavaScript** | Sin frameworks adicionales |
+| **OrbitControls** | Control de cámara interactivo |
+| **PMREMGenerator** | Generación de mapas de entorno HDRI |
+
+> Entorno: Navegador moderno con soporte WebGL, servidor HTTP local (Python http.server o Node.js http-server).
+
+---
+
+### ✅ Descripción de los módulos aplicados (A–K)
+
+| Módulo | Aplicación en el proyecto |
+|--------|---------------------------|
+| **A. Scene Setup** | Configuración de escena, renderer WebGL, cámaras perspectiva y ortográfica |
+| **B. Modelado 3D** | Geometrías procedurales: esfera, cubo, toro, cono |
+| **C. Materiales** | `MeshStandardMaterial` con workflow PBR (roughness, metalness) |
+| **D. Texturizado dinámico** | Normal map procedural generado con Canvas API y patrones sinusoidales |
+| **E. Shaders** | Material estándar de Three.js con modelo Cook-Torrance |
+| **F. Partículas** | No aplicado en este proyecto |
+| **G. Sincronización visual** | Animaciones sincronizadas de materiales y luces |
+| **H. Interacción** | Panel de control HTML con sliders y selectores de color en tiempo real |
+| **I. Luces** | Sistema de 3 luces direccionales (key, fill, rim) + ambiente + HDRI environment |
+| **J. Controles de cámara** | `OrbitControls` con zoom, rotación, pan y alternancia perspectiva/ortográfica |
+| **K. Panel UI interno** | Panel de control flotante con controles de material, iluminación y color |
+
+---
+
+### 🧩 Código relevante o fragmentos clave
+
+#### ✅ Clase ColorUtils - Conversión de espacios cromáticos
+
+```javascript
+class ColorUtils {
+    // Convert RGB to CIELAB
+    static rgbToLab(r, g, b) {
+        // First convert to XYZ
+        r = r / 255;
+        g = g / 255;
+        b = b / 255;
+        
+        // Apply gamma correction
+        r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+        g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+        b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+        
+        // Convert to XYZ using sRGB matrix
+        let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
+        let y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.00000;
+        let z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
+        
+        // Convert XYZ to Lab
+        const fx = x > 0.008856 ? Math.pow(x, 1/3) : (7.787 * x + 16/116);
+        const fy = y > 0.008856 ? Math.pow(y, 1/3) : (7.787 * y + 16/116);
+        const fz = z > 0.008856 ? Math.pow(z, 1/3) : (7.787 * z + 16/116);
+        
+        const L = Math.round((116 * fy - 16) * 10) / 10;
+        const a = Math.round((500 * (fx - fy)) * 10) / 10;
+        const b_lab = Math.round((200 * (fy - fz)) * 10) / 10;
+        
+        return { L, a, b: b_lab };
+    }
+}
+```
+
+#### ✅ Generación procedural de Normal Map
+
+```javascript
+generateNormalMap() {
+    const size = 512;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    
+    const imageData = ctx.createImageData(size, size);
+    const data = imageData.data;
+    
+    for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+            const index = (y * size + x) * 4;
+            
+            // Create a wave pattern for surface detail
+            const fx = x / size;
+            const fy = y / size;
+            const noise = Math.sin(fx * Math.PI * 8) * Math.cos(fy * Math.PI * 8) * 0.5 + 0.5;
+            
+            // Normal map encoding: R = X, G = Y, B = Z
+            data[index] = 128; // R
+            data[index + 1] = 128; // G
+            data[index + 2] = Math.floor(128 + noise * 127); // B (height)
+            data[index + 3] = 255; // A
+        }
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+    const normalTexture = new THREE.CanvasTexture(canvas);
+    this.pbrMaterial.normalMap = normalTexture;
+}
+```
+
+#### ✅ Sistema de iluminación múltiple
+
+```javascript
+setupLights() {
+    // Key Light (main light from front-right)
+    this.keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    this.keyLight.position.set(5, 8, 5);
+    
+    // Fill Light (softer light from left)
+    this.fillLight = new THREE.DirectionalLight(0x8db4ff, 0.5);
+    this.fillLight.position.set(-5, 3, 2);
+    
+    // Rim Light (back light for edge definition)
+    this.rimLight = new THREE.DirectionalLight(0xffd4a3, 0.8);
+    this.rimLight.position.set(-3, 4, -8);
+    
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+    this.scene.add(ambientLight);
+}
+```
+
+#### ✅ HDRI Environment Mapping procedural
+
+```javascript
+setupEnvironment() {
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+    const envScene = new THREE.Scene();
+    
+    // Add multiple colored lights to create a rich environment
+    const skyLight = new THREE.DirectionalLight(0x87ceeb, 2.0);
+    const sunLight = new THREE.DirectionalLight(0xffd700, 3.0);
+    const groundLight = new THREE.DirectionalLight(0xff6b35, 1.5);
+    
+    // Generate the environment map
+    const renderTarget = pmremGenerator.fromScene(envScene, 0.04);
+    this.environmentMap = renderTarget.texture;
+    this.scene.environment = this.environmentMap;
+}
+```
+
+---
+
+### 📌 Evidencias gráficas
+
+#### ✅ Escena completa
+
+![Escena Completa](renders/punto1_escena_completa.gif)
+
+#### ✅ Luz y materiales con presets distintos
+
+El sistema permite ajustar en tiempo real:
+- **Albedo (Color Base)**: Selector de color que actualiza el material y muestra valores RGB, HSV y CIELAB
+- **Roughness**: Control de rugosidad (0 = espejo, 1 = mate)
+- **Metalness**: Control de metalicidad (0 = dieléctrico, 1 = conductor)
+- **Normal Map Intensity**: Intensidad del mapa normal procedural
+- **Intensidades de luz**: Key, Fill, Rim y HDRI Environment ajustables independientemente
+
+#### ✅ Modelado procedural y shaders dinámicos
+
+- **Normal Map procedural**: Generado dinámicamente usando patrones sinusoidales en Canvas API
+- **Animaciones procedurales**: Variación automática de roughness, metalness e intensidades de luz
+- **Material PBR**: Implementación del modelo Cook-Torrance con energy conservation
+
+#### ✅ Interacción por voz, gestos o colisiones
+
+- **Panel de control interactivo**: Sliders y selectores que modifican propiedades en tiempo real
+- **Controles de cámara**: OrbitControls con zoom, rotación y pan
+- **Alternancia de cámaras**: Cambio dinámico entre proyección perspectiva y ortográfica
+
+---
+
+### 🧠 Prompts o ideas base
+
+> "Crear un sistema de visualización 3D que permita explorar materiales PBR realistas con control total sobre iluminación y análisis de color en múltiples espacios cromáticos. El sistema debe ser interactivo y educativo, mostrando cómo diferentes configuraciones afectan la percepción visual."
+
+---
+
+### 🧩 Reflexión: aprendizajes, retos técnicos y mejoras posibles
+
+**Aprendizajes:**
+- Los materiales PBR requieren un entendimiento profundo de física de luz y reflexión
+- La conversión entre espacios cromáticos (RGB → XYZ → CIELAB) es compleja pero esencial para análisis de color preciso
+- El environment mapping procedural permite crear reflexiones realistas sin necesidad de archivos HDRI externos
+- Los normal maps procedurales ofrecen flexibilidad para crear variación de superficie sin texturas externas
+
+**Retos técnicos:**
+- Sincronizar múltiples luces para lograr iluminación equilibrada y estéticamente agradable
+- Implementar correctamente la conversión CIELAB con corrección gamma y matrices de transformación
+- Generar normal maps procedurales con patrones coherentes y visualmente atractivos
+- Mantener buen rendimiento con múltiples objetos 3D, luces y environment mapping
+
+**Mejoras posibles:**
+- ✅ Implementar sistema de presets de material predefinidos
+- ✅ Agregar exportación de configuraciones de material y color
+- ✅ Integrar más espacios cromáticos (CMYK, XYZ, etc.)
+- ✅ Añadir visualización de histogramas de color
+- ✅ Implementar sistema de grabación de animaciones
+- ✅ Agregar soporte para importar texturas externas
+- ✅ Crear modo de comparación lado a lado de diferentes configuraciones
+
+---
+
 ## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:

@@ -150,6 +150,13 @@ class PBRScene {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
+        this.controls.target.set(0, 0, 0); // Centro de la escena
+        this.controls.minDistance = 2; // Distancia mínima de zoom
+        this.controls.maxDistance = 20; // Distancia máxima de zoom
+        this.controls.enablePan = true; // Permitir pan
+        this.controls.screenSpacePanning = false; // Pan en el plano perpendicular a la cámara
+        this.controls.zoomSpeed = 1.0; // Velocidad de zoom
+        this.controls.update();
         
         // Scene setup - IMPORTANT: Environment must be created before materials
         this.setupScene();
@@ -360,12 +367,18 @@ class PBRScene {
         });
         
         cameraTypeSelect.addEventListener('change', (e) => {
+            const currentPos = this.camera.position.clone();
+            const currentTarget = this.controls.target.clone();
+            
             if (e.target.value === 'perspective') {
                 this.camera = this.perspectiveCamera;
             } else {
                 this.camera = this.orthographicCamera;
             }
+            
+            this.camera.position.copy(currentPos);
             this.controls.object = this.camera;
+            this.controls.target.copy(currentTarget);
             this.controls.update();
         });
         
@@ -381,8 +394,7 @@ class PBRScene {
             this.meshes.forEach(mesh => {
                 mesh.material.color.copy(color);
             });
-            // Sincronizar con el selector de paleta
-            document.getElementById('palette-color').value = hexColor;
+            // Actualizar información de color en la paleta
             this.updateColorInfo(hexColor);
         });
         
@@ -446,21 +458,6 @@ class PBRScene {
             this.pbrMaterial.envMapIntensity = value;
         });
         
-        // Palette color - debe aplicar el color a los objetos también
-        const paletteInput = document.getElementById('palette-color');
-        paletteInput.addEventListener('input', (e) => {
-            const hexColor = e.target.value;
-            const color = new THREE.Color(hexColor);
-            // Aplicar el color a los objetos 3D
-            this.meshes.forEach(mesh => {
-                mesh.material.color.copy(color);
-            });
-            // Sincronizar con el selector de albedo
-            document.getElementById('albedo-color').value = hexColor;
-            // Actualizar información de color
-            this.updateColorInfo(hexColor);
-        });
-        
         // Animation toggle
         const toggleAnimationBtn = document.getElementById('toggle-animation');
         toggleAnimationBtn.addEventListener('click', () => {
@@ -474,9 +471,8 @@ class PBRScene {
             this.resetMaterial();
         });
         
-        // Initialize color info and sync both color pickers
+        // Initialize color info
         const initialColor = '#808080';
-        document.getElementById('palette-color').value = initialColor;
         document.getElementById('albedo-color').value = initialColor;
         this.updateColorInfo(initialColor);
     }
@@ -519,7 +515,6 @@ class PBRScene {
     resetMaterial() {
         const resetColor = '#808080';
         document.getElementById('albedo-color').value = resetColor;
-        document.getElementById('palette-color').value = resetColor;
         document.getElementById('roughness').value = '0.5';
         document.getElementById('metalness').value = '0.5';
         document.getElementById('normal-intensity').value = '1.0';

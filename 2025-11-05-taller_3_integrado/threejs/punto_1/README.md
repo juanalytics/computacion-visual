@@ -4,9 +4,15 @@
 
 Este ejercicio implementa un sistema completo de materiales PBR (Physically Based Rendering) con iluminación múltiple, control de cámaras y análisis de color en diferentes espacios cromáticos (RGB, HSV, CIELAB).
 
+### ✅ Escena completa:
+
+![Escena Completa](./../../renders/punto1_escena_completa.gif)
+
 ## Características Implementadas
 
 ### ✅ Materiales PBR
+
+![Materiales PBR](./../../renders/punto1_material.gif)
 
 - **Albedo (Color Base)**: Control del color base del material mediante selector de color
 - **Roughness (Rugosidad)**: Control de la rugosidad de la superficie (0 = espejo, 1 = mate)
@@ -15,12 +21,16 @@ Este ejercicio implementa un sistema completo de materiales PBR (Physically Base
 
 ### ✅ Iluminación Múltiple
 
+![Iluminación Múltiple](./../../renders/punto1_iluminacion.gif)
+
 - **Key Light**: Luz principal direccional desde el frente-derecha
 - **Fill Light**: Luz suave de relleno desde la izquierda (color azulado)
 - **Rim Light**: Luz de borde desde atrás para definir siluetas (color cálido)
 - **HDRI Environment**: Mapa de entorno procedural para reflexiones realistas
 
 ### ✅ Cámaras
+
+![Cámaras](./../../renders/punto1_camara.gif)
 
 - **Perspectiva**: Proyección con punto de fuga (perspectiva natural)
 - **Ortográfica**: Proyección paralela sin distorsión de perspectiva
@@ -29,12 +39,16 @@ Este ejercicio implementa un sistema completo de materiales PBR (Physically Base
 
 ### ✅ Paleta de Colores y Espacios Cromáticos
 
+![Paleta de Colores](./../../renders/punto1_paleta.gif)
+
 - **RGB**: Valores Red, Green, Blue (0-255)
 - **HSV**: Hue (matiz), Saturation (saturación), Value (brillo)
 - **CIELAB**: Espacio de color perceptualmente uniforme (L*, a*, b*)
 - **Cálculo de Contraste**: Comparación con fondo usando diferencias en CIELAB
 
 ### ✅ Animaciones
+
+![Animaciones](./../../renders/punto1_animacion.gif)
 
 - Rotación continua de objetos 3D
 - Animación de propiedades de material (roughness, metalness)
@@ -68,7 +82,7 @@ npx http-server
 ## Estructura del Código
 
 ```
-ejercicio_1_pbr/
+punto_1/
 ├── index.html          # Interfaz HTML con controles
 ├── main.js             # Lógica principal de Three.js
 └── README.md           # Este archivo
