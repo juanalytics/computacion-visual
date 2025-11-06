@@ -6,29 +6,52 @@ Este ejercicio demuestra la generación de geometría 3D mediante algoritmos pro
 
 ## Características Implementadas
 
+![Escena Completa](./../../renders/punto2_escena_completa.gif)
+
 ### ✅ Generación de Geometría por Algoritmos
 
 #### Rejilla Procedural
+
+![Rejilla Procedural](./../../renders/punto2_rejilla.gif)
+
 - Generación de mallas cuadriculadas mediante bucles anidados
 - Control de ancho, alto y espaciado
 - Comparación con geometría manual (PlaneGeometry)
 
 #### Espirales
+
+![Espiral 2D](./../../renders/punto2_espiral2D.gif)
+
 - **Espiral 2D**: Generación mediante coordenadas polares
+
+![Espiral 3D](./../../renders/punto2_espiral3D.gif)
+
 - **Espiral 3D**: Extensión tridimensional con altura variable
 - Control de vueltas, radio inicial y paso angular
 
 #### Fractales Simples
+
+![Triángulo de Sierpinski](./../../renders/punto2_fractal1.gif)
+
 - **Triángulo de Sierpinski**: Implementación recursiva del fractal clásico
+
+![Copo de Nieve de Koch](./../../renders/punto2_fractal2.gif)
+
 - **Copo de Nieve de Koch**: Generación de curva fractal mediante subdivisión recursiva
 - Control de iteraciones y tamaño
 
 #### Terreno Procedural
+
+![Terreno Procedural](./../../renders/punto2_terreno.gif)
+
 - Generación de superficies mediante funciones de ruido
 - Control de resolución, altura máxima y frecuencia
 - Cálculo automático de normales para iluminación
 
 #### Onda Procedural
+
+![Onda Procedural](./../../renders/punto2_onda.gif)
+
 - Superficie animada mediante funciones trigonométricas
 - Control de amplitud, frecuencia y velocidad de animación
 

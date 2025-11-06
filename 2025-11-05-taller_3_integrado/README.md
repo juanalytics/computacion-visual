@@ -222,6 +222,304 @@ El sistema permite ajustar en tiempo real:
 
 ---
 
+## 2. Proyecto: Modelado Procedural desde Código
+
+### ✅ Concepto del proyecto o experimento visual
+
+Este proyecto demuestra la generación de geometría 3D mediante algoritmos procedurales, explorando diferentes técnicas de modelado por código. El objetivo es mostrar cómo se pueden crear formas complejas y variadas mediante algoritmos matemáticos en lugar de modelado manual.
+
+El experimento visual incluye:
+- **Geometrías procedurales**: Rejillas, espirales 2D/3D, fractales (Sierpinski, Koch), terrenos y ondas
+- **Bucles y recursión**: Implementación de patrones espaciales mediante iteración y recursión
+- **Modificación dinámica de vértices**: Transformaciones en tiempo real (ruido, ondas, torsión, curvatura)
+- **Comparativa procedural vs manual**: Visualización lado a lado de las ventajas del modelado por código
+
+El sistema permite explorar cómo algoritmos simples pueden generar geometrías complejas e infinitamente variables mediante parámetros ajustables.
+
+---
+
+### 🚀 Herramientas y entorno usado
+
+| Herramienta | Uso |
+|-------------|-----|
+| **Three.js v0.160.0** | Motor 3D WebGL para renderizado |
+| **ES6 Modules** | Sistema de módulos moderno |
+| **Vanilla JavaScript** | Sin frameworks adicionales |
+| **OrbitControls** | Control de cámara interactivo |
+| **BufferGeometry** | Generación de geometría desde arrays de vértices |
+
+> Entorno: Navegador moderno con soporte WebGL, servidor HTTP local (Python http.server o Node.js http-server).
+
+---
+
+### ✅ Descripción de los módulos aplicados (A–K)
+
+| Módulo | Aplicación en el proyecto |
+|--------|---------------------------|
+| **A. Scene Setup** | Configuración de escena, renderer WebGL, cámara perspectiva y controles |
+| **B. Modelado 3D** | Generación procedural de geometrías: rejillas, espirales, fractales, terrenos, ondas |
+| **C. Materiales** | Materiales estándar con diferentes colores para distinguir tipos de geometría |
+| **D. Texturizado dinámico** | No aplicado directamente, pero se generan normales procedurales |
+| **E. Shaders** | Material estándar de Three.js, cálculo de normales procedurales |
+| **F. Partículas** | No aplicado en este proyecto |
+| **G. Sincronización visual** | Animación sincronizada de geometrías y modificaciones de vértices |
+| **H. Interacción** | Panel de control HTML con selectores de tipo, parámetros y transformaciones |
+| **I. Luces** | Sistema de iluminación básico con luz direccional y ambiente |
+| **J. Controles de cámara** | `OrbitControls` con zoom, rotación y pan |
+| **K. Panel UI interno** | Panel de control flotante con selectores de geometría, parámetros y modificaciones |
+
+---
+
+### 🧩 Código relevante o fragmentos clave
+
+#### ✅ Generación de Rejilla Procedural
+
+```javascript
+static createGrid(width, height, spacing) {
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const indices = [];
+    
+    // Generate vertices using nested loops
+    for (let z = 0; z <= height; z++) {
+        for (let x = 0; x <= width; x++) {
+            vertices.push(
+                (x - width / 2) * spacing,
+                0,
+                (z - height / 2) * spacing
+            );
+        }
+    }
+    
+    // Generate indices for quads
+    for (let z = 0; z < height; z++) {
+        for (let x = 0; x < width; x++) {
+            const a = z * (width + 1) + x;
+            const b = a + 1;
+            const c = a + width + 1;
+            const d = c + 1;
+            
+            // Two triangles per quad
+            indices.push(a, c, b);
+            indices.push(b, c, d);
+        }
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    
+    return geometry;
+}
+```
+
+#### ✅ Recursión en Fractales - Triángulo de Sierpinski
+
+```javascript
+static createSierpinskiTriangle(iterations, size) {
+    // Helper function to subdivide triangle recursively
+    function subdivideTriangle(p1, p2, p3, depth) {
+        if (depth === 0) {
+            // Base case: add triangle
+            const startIndex = vertices.length / 3;
+            vertices.push(p1.x, p1.y, p1.z);
+            vertices.push(p2.x, p2.y, p2.z);
+            vertices.push(p3.x, p3.y, p3.z);
+            indices.push(startIndex, startIndex + 1, startIndex + 2);
+            return;
+        }
+        
+        // Calculate midpoints
+        const m1 = new THREE.Vector3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2);
+        const m2 = new THREE.Vector3((p2.x + p3.x) / 2, (p2.y + p3.y) / 2, (p2.z + p3.z) / 2);
+        const m3 = new THREE.Vector3((p1.x + p3.x) / 2, (p1.y + p3.y) / 2, (p1.z + p3.z) / 2);
+        
+        // Recursively subdivide the three new triangles
+        subdivideTriangle(p1, m1, m3, depth - 1);
+        subdivideTriangle(m1, p2, m2, depth - 1);
+        subdivideTriangle(m3, m2, p3, depth - 1);
+    }
+    
+    // Initial triangle and recursive subdivision
+    const p1 = new THREE.Vector3(0, size, 0);
+    const p2 = new THREE.Vector3(-size * Math.sqrt(3) / 2, -size / 2, 0);
+    const p3 = new THREE.Vector3(size * Math.sqrt(3) / 2, -size / 2, 0);
+    subdivideTriangle(p1, p2, p3, iterations);
+}
+```
+
+#### ✅ Generación de Terreno Procedural
+
+```javascript
+static createTerrain(resolution, maxHeight, frequency) {
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const indices = [];
+    
+    // Generate height map using simple noise function
+    function noise(x, z) {
+        return Math.sin(x * frequency) * Math.cos(z * frequency) * maxHeight;
+    }
+    
+    // Generate vertices with height variation
+    for (let z = 0; z <= resolution; z++) {
+        for (let x = 0; x <= resolution; x++) {
+            const fx = (x / resolution) * 10 - 5;
+            const fz = (z / resolution) * 10 - 5;
+            const y = noise(fx, fz);
+            
+            vertices.push(fx, y, fz);
+        }
+    }
+    
+    // Generate indices for quads
+    for (let z = 0; z < resolution; z++) {
+        for (let x = 0; x < resolution; x++) {
+            const a = z * (resolution + 1) + x;
+            const b = a + 1;
+            const c = a + resolution + 1;
+            const d = c + 1;
+            
+            indices.push(a, c, b);
+            indices.push(b, c, d);
+        }
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    
+    return geometry;
+}
+```
+
+#### ✅ Modificación Dinámica de Vértices - Torsión
+
+```javascript
+static applyTwist(geometry, intensity) {
+    const positions = geometry.attributes.position;
+    
+    for (let i = 0; i < positions.count; i++) {
+        const i3 = i * 3;
+        const x = positions.array[i3];
+        const y = positions.array[i3 + 1];
+        const z = positions.array[i3 + 2];
+        
+        const angle = y * intensity;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        
+        const newX = x * cos - z * sin;
+        const newZ = x * sin + z * cos;
+        
+        positions.array[i3] = newX;
+        positions.array[i3 + 2] = newZ;
+    }
+    
+    positions.needsUpdate = true;
+    geometry.computeVertexNormals();
+}
+```
+
+#### ✅ Generación de Onda Procedural Animada
+
+```javascript
+static createWave(amplitude, frequency, time = 0) {
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const indices = [];
+    const resolution = 50;
+    
+    for (let z = 0; z <= resolution; z++) {
+        for (let x = 0; x <= resolution; x++) {
+            const fx = (x / resolution) * 10 - 5;
+            const fz = (z / resolution) * 10 - 5;
+            const y = Math.sin(fx * frequency + time) * Math.cos(fz * frequency + time) * amplitude;
+            
+            vertices.push(fx, y, fz);
+        }
+    }
+    
+    // Generate indices for quads
+    for (let z = 0; z < resolution; z++) {
+        for (let x = 0; x < resolution; x++) {
+            const a = z * (resolution + 1) + x;
+            const b = a + 1;
+            const c = a + resolution + 1;
+            const d = c + 1;
+            
+            indices.push(a, c, b);
+            indices.push(b, c, d);
+        }
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    
+    return geometry;
+}
+```
+
+---
+
+### 📌 Evidencias gráficas
+
+#### ✅ Escena completa
+
+![Escena Completa](renders/punto2_escena_completa.gif)
+
+#### ✅ Modelado procedural y shaders dinámicos
+
+- **Rejillas procedurales**: Generación mediante bucles anidados con control de ancho, alto y espaciado
+- **Espirales 2D y 3D**: Generación mediante coordenadas polares con control de vueltas, radio y paso angular
+- **Fractales recursivos**: Triángulo de Sierpinski y Copo de Nieve de Koch mediante subdivisión recursiva
+- **Terrenos procedurales**: Superficies generadas mediante funciones de ruido con control de resolución y altura
+- **Ondas animadas**: Superficies animadas mediante funciones trigonométricas con control de amplitud y frecuencia
+
+#### ✅ Interacción por voz, gestos o colisiones
+
+- **Panel de control interactivo**: Selector de tipo de geometría, ajuste de parámetros y aplicación de transformaciones
+- **Modificaciones dinámicas**: Aplicación de ruido, ondas, torsión y curvatura en tiempo real
+- **Animación de vértices**: Modificación continua de geometrías mediante funciones temporales
+- **Comparativa visual**: Visualización lado a lado de geometría procedural vs manual
+
+---
+
+### 🧠 Prompts o ideas base
+
+> "Crear un sistema de generación procedural de geometría 3D que demuestre cómo algoritmos matemáticos simples pueden generar formas complejas e infinitamente variables. El sistema debe incluir diferentes técnicas: bucles anidados para rejillas, recursión para fractales, funciones de ruido para terrenos, y transformaciones dinámicas de vértices para animación."
+
+---
+
+### 🧩 Reflexión: aprendizajes, retos técnicos y mejoras posibles
+
+**Aprendizajes:**
+- Los bucles anidados son fundamentales para generar mallas regulares (rejillas, terrenos)
+- La recursión permite crear patrones fractales complejos con código relativamente simple
+- Las funciones matemáticas (seno, coseno, ruido) pueden generar variación natural en geometrías
+- La modificación dinámica de vértices permite animación y deformación en tiempo real
+- El modelado procedural ofrece ventajas significativas sobre el modelado manual: variabilidad infinita, control preciso y fácil animación
+
+**Retos técnicos:**
+- Implementar correctamente la recursión en fractales sin causar stack overflow
+- Generar índices correctos para mallas complejas (triangulación)
+- Calcular normales procedurales para iluminación correcta
+- Mantener buen rendimiento con geometrías de alta resolución
+- Sincronizar animaciones de vértices con el loop de renderizado
+
+**Mejoras posibles:**
+- ✅ Implementar más tipos de fractales (Mandelbrot, Julia sets)
+- ✅ Agregar generación de ruido Perlin para terrenos más realistas
+- ✅ Implementar sistema de L-systems para generación de plantas procedurales
+- ✅ Agregar exportación de geometrías generadas a formatos estándar (OBJ, GLTF)
+- ✅ Implementar sistema de presets de geometrías procedurales
+- ✅ Agregar visualización de wireframe y normales
+- ✅ Crear sistema de combinación de múltiples técnicas procedurales
+- ✅ Implementar generación de geometría basada en curvas de Bézier
+
+---
+
 ## 4. Proyecto: Texturizado Dinámico + Partículas con React Three Fiber
 
 Este proyecto es un experimento visual interactivo en 3D utilizando **React Three Fiber**, combinando:
