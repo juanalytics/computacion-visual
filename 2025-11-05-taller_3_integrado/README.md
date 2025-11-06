@@ -488,5 +488,166 @@ cv2.destroyAllWindows()
 - Versión web con **MediaPipe JS**
 
 
+# 🎙️ 8. Reconocimiento de Voz y Control por Comandos
+
+## 🎯 Concepto del proyecto
+
+Este proyecto implementa un sistema interactivo que permite controlar acciones visuales mediante comandos de voz, combinando reconocimiento auditivo, retroalimentación hablada y comunicación con entornos gráficos como Unity mediante el protocolo **OSC (Open Sound Control)**.
+
+El sistema escucha en tiempo real, interpreta órdenes habladas, ejecuta acciones visuales y responde verbalmente al usuario, creando una experiencia multimodal natural entre voz y entorno visual.
+
+---
+
+## 🛠️ Herramientas y entorno utilizado
+
+| Herramienta | Rol |
+|-------------:|-----|
+| Python 3.x | Lenguaje principal de procesamiento de voz |
+| SpeechRecognition | Captura y reconocimiento de audio |
+| PyAudio | Interfaz para acceder al micrófono |
+| CMU Sphinx | Motor de reconocimiento de voz local (offline) |
+| pyttsx3 | Síntesis de voz para retroalimentación hablada |
+| python-osc | Comunicación con Unity mediante OSC |
+| Unity 2022.3 LTS + extOSC | Motor visual para recibir comandos y ejecutar acciones |
+
+---
+
+## 🧩 Módulos implementados
+
+| Componente | Función |
+|-----------:|--------|
+| Captura de audio | Escucha continua desde el micrófono |
+| Reconocimiento de voz | Traduce audio a texto con SpeechRecognition o Sphinx |
+| Diccionario de comandos | Define palabras clave y sus acciones asociadas |
+| Enlace OSC | Envía mensajes al entorno Unity en tiempo real |
+| Retroalimentación hablada | Responde verbalmente según el comando recibido |
+
+---
+
+## 📌 Código relevante
+
+### 🎧 Captura y reconocimiento de voz
+```python
+import speech_recognition as sr
+
+r = sr.Recognizer()
+with sr.Microphone() as source:
+    print("🎤 Diga un comando...")
+    audio = r.listen(source)
+
+try:
+    comando = r.recognize_sphinx(audio).lower()
+    print("🗣️ Comando detectado:", comando)
+except sr.UnknownValueError:
+    print("No se entendió el audio")
+```
+
+### 🧠 Diccionario de comandos y envío OSC
+```python
+from pythonosc import udp_client
+
+# Cliente OSC → Unity
+client = udp_client.SimpleUDPClient("127.0.0.1", 9000)
+
+acciones = {
+    "rojo": "/colorRed",
+    "verde": "/colorGreen",
+    "azul": "/colorBlue",
+    "girar": "/rotate",
+    "detener": "/stop"
+}
+
+if comando in acciones:
+    ruta = acciones[comando]
+    client.send_message(ruta, 1)
+    print(f"📡 Enviando acción: {ruta}")
+else:
+    print("❌ Comando no reconocido")
+```
+
+### 🔊 Retroalimentación hablada
+```python
+import pyttsx3
+
+voz = pyttsx3.init()
+voz.say(f"Comando {comando} ejecutado")
+voz.runAndWait()
+```
+
+---
+
+## 🧱 Configuración en Unity
+
+1. Instalar **extOSC** desde GitHub: https://github.com/Iam1337/extOSC  
+2. Crear un **GameObject vacío** llamado `OSCReceiver`.  
+3. Añadir el componente **OSC Receiver** y configurar:
+   - **Local Port:** `7000`  
+4. Crear un script C# con acciones asociadas a cada ruta OSC, por ejemplo:
+
+```csharp
+using UnityEngine;
+using extOSC;
+
+public class VoiceController : MonoBehaviour
+{
+    public Renderer cubeRenderer;
+    public GameObject cube;
+
+    void Start()
+    {
+        var receiver = GetComponent<OSCReceiver>();
+        receiver.Bind("/colorRed", msg => cubeRenderer.material.color = Color.red);
+        receiver.Bind("/colorGreen", msg => cubeRenderer.material.color = Color.green);
+        receiver.Bind("/colorBlue", msg => cubeRenderer.material.color = Color.blue);
+        receiver.Bind("/rotate", msg => cube.transform.Rotate(Vector3.up, 45f));
+        receiver.Bind("/stop", msg => cube.transform.rotation = Quaternion.identity);
+    }
+}
+```
+
+---
+
+## 🖼️ Capacidades del sistema
+
+### ✅ Interactividad multimodal
+- Integración fluida entre voz y entorno visual.  
+- Control natural sin interfaces gráficas.
+
+### ✅ Modos de reconocimiento
+- **Offline:** con CMU Sphinx (sin conexión a Internet).  
+- **Online:** con API de Google para mayor precisión.
+
+### ✅ Retroalimentación inmediata
+- Confirmación por voz y visualización instantánea en Unity.
+
+---
+
+## 💡 Aplicaciones potenciales
+
+- 🎮 Videojuegos interactivos por voz  
+- 🧠 Interfaces accesibles para personas con movilidad reducida  
+- 🎨 Instalaciones artísticas controladas mediante sonido  
+- 🤖 Sistemas de robótica o IoT por comandos verbales  
+- 🎥 Control de cámaras o escenas en entornos 3D
+
+---
+
+## 🧠 Reflexión: aprendizajes, retos y mejoras
+
+### ✅ Aprendizajes obtenidos
+- Configuración de reconocimiento de voz local sin conexión.  
+- Comunicación efectiva entre Python y Unity mediante OSC.  
+- Diseño de diccionarios de comandos robustos.
+
+### ⚠️ Retos técnicos
+- Latencia en reconocimiento con micrófonos de baja calidad.  
+- Limitaciones de CMU Sphinx en español.  
+- Requiere sincronización de puertos y direcciones OSC.
+
+### 🚀 Mejoras futuras
+- Entrenamiento de modelo personalizado con comandos específicos.  
+- Implementación de reconocimiento continuo con buffer dinámico.  
+- Control de múltiples objetos o animaciones.  
+- Integración con MediaPipe para control gestual-voz combinado.
 
 
