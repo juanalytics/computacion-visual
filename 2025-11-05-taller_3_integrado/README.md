@@ -651,3 +651,166 @@ public class VoiceController : MonoBehaviour
 - Integración con MediaPipe para control gestual-voz combinado.
 
 
+# 🎙️ 9. Interfaces Multimodales (Voz + Gestos)
+
+## 🎯 Concepto del proyecto
+Este proyecto integra **reconocimiento de voz** y **detección de gestos** en un sistema sincronizado que responde a comandos combinados.  
+La arquitectura utiliza **procesamiento en paralelo** mediante hilos para capturar y analizar audio y video de forma simultánea, permitiendo acciones multimodales como *“pellizcar mientras se dice ‘zoom’”* o *“mano abierta mientras se dice ‘activar’”*.
+
+El propósito es explorar la interacción humano-computador a través de entradas naturales y coordinadas, combinando visión, sonido y sincronización temporal.
+
+---
+
+## 🛠️ Herramientas y entorno utilizado
+| Herramienta | Rol |
+|--------------|-----|
+| Python 3.x | Lenguaje principal |
+| OpenCV | Captura y visualización de video |
+| MediaPipe Hands | Detección y tracking de gestos |
+| SpeechRecognition | Reconocimiento de voz |
+| NumPy | Cálculos y operaciones con coordenadas |
+| Threading / Queue | Procesamiento paralelo y comunicación entre hilos |
+
+---
+
+## 🧩 Módulos implementados
+| Componente | Función |
+|-------------|----------|
+| Detección de gestos | Usa MediaPipe para identificar gestos como *pinch* o *mano abierta* |
+| Reconocimiento de voz | Captura comandos hablados en español mediante micrófono |
+| Coordinador multimodal | Sincroniza ambos tipos de entrada según una ventana de tiempo |
+| Lógica de acciones | Define reacciones condicionales ante coincidencias voz–gesto |
+| Feedback visual | Muestra video en tiempo real con landmarks y mensajes de sincronización |
+
+---
+
+## 📌 Código relevante
+
+```python
+import cv2
+import mediapipe as mp
+import threading
+import queue
+import time
+import speech_recognition as sr
+import numpy as np
+
+# --- Colas y Constantes ---
+event_q = queue.Queue()
+SYNC_WINDOW = 0.8  
+
+# --- Configuración de MediaPipe ---
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+mp_draw = mp.solutions.drawing_utils
+
+# --- Hilo 1: Detección de Gestos ---
+def gesture_worker(stop_event):
+    cap = cv2.VideoCapture(0)
+    while not stop_event.is_set():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = hands.process(img_rgb)
+        gesture = None
+        if results.multi_hand_landmarks:
+            lm = results.multi_hand_landmarks[0].landmark
+            thumb_tip = np.array([lm[4].x, lm[4].y])
+            index_tip = np.array([lm[8].x, lm[8].y])
+            dist = np.linalg.norm(thumb_tip - index_tip)
+            gesture = 'pinch' if dist < 0.05 else 'open_hand'
+            mp_draw.draw_landmarks(frame, results.multi_hand_landmarks[0], mp_hands.HAND_CONNECTIONS)
+        if gesture:
+            event_q.put({'type': 'gesture', 'name': gesture, 'time': time.time(), 'frame': frame.copy()})
+        cv2.imshow('Gestos', frame)
+        if cv2.waitKey(1) & 0xFF == 27:
+            break
+    cap.release()
+    cv2.destroyWindow('Gestos')
+
+# --- Hilo 2: Reconocimiento de Voz ---
+def voice_worker(stop_event):
+    r = sr.Recognizer()
+    mic = sr.Microphone()
+    with mic as source:
+        r.adjust_for_ambient_noise(source)
+    while not stop_event.is_set():
+        with mic as source:
+            try:
+                audio = r.listen(source, phrase_time_limit=3)
+                text = r.recognize_google(audio, language='es-ES')
+                event_q.put({'type': 'voice', 'text': text.lower(), 'time': time.time()})
+            except sr.UnknownValueError:
+                pass
+            except Exception as e:
+                print(f'Voice error: {e}')
+
+# --- Hilo 3: Coordinador Multimodal ---
+def coordinator_loop(stop_event):
+    last_gesture, last_voice = None, None
+    while not stop_event.is_set():
+        try:
+            event = event_q.get(timeout=0.1)
+            current_time = time.time()
+            if event['type'] == 'gesture':
+                last_gesture = event
+                print(f"-> Gesto detectado: {event['name']}")
+                if last_voice and (current_time - last_voice['time']) < SYNC_WINDOW:
+                    print(f"!!! SINCRONIZACIÓN GESTO/VOZ !!!  ({last_gesture['name']} + {last_voice['text']})")
+                    last_voice = None
+            elif event['type'] == 'voice':
+                last_voice = event
+                print(f"-> Voz detectada: '{event['text']}'")
+                if last_gesture and (current_time - last_gesture['time']) < SYNC_WINDOW:
+                    print(f"!!! SINCRONIZACIÓN VOZ/GESTO !!!  ({last_voice['text']} + {last_gesture['name']})")
+                    last_gesture = None
+            event_q.task_done()
+        except queue.Empty:
+            current_time = time.time()
+            if last_gesture and (current_time - last_gesture['time']) > SYNC_WINDOW:
+                last_gesture = None
+            if last_voice and (current_time - last_voice['time']) > SYNC_WINDOW:
+                last_voice = None
+        except Exception as e:
+            print(f"Coordinator error: {e}")
+
+def main():
+    stop_event = threading.Event()
+    tg = threading.Thread(target=gesture_worker, args=(stop_event,), daemon=True)
+    tv = threading.Thread(target=voice_worker, args=(stop_event,), daemon=True)
+    tc = threading.Thread(target=coordinator_loop, args=(stop_event,), daemon=True)
+    print("Iniciando hilos multimodales (Gestos, Voz, Coordinador)...")
+    tg.start(); tv.start(); tc.start()
+    print("Presiona Ctrl+C o ESC para salir.")
+    try:
+        while tc.is_alive():
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nSalida solicitada (Ctrl+C).")
+    finally:
+        stop_event.set()
+        time.sleep(2)
+        print("Saliendo...")
+
+if __name__ == '__main__':
+    main()
+
+```
+
+---
+
+# ⚙️ Sincronización y comportamiento esperado y 🧠 Reflexión
+
+## Sincronización y comportamiento esperado
+- Cada hilo funciona de forma independiente (voz, gestos, coordinación).
+- El coordinador detecta si un gesto y un comando de voz ocurren dentro de una ventana temporal de 0.8 segundos.
+- Cuando ambas entradas coinciden, imprime un mensaje de sincronización:
+
+## Reflexión y mejoras futuras
+| Aspecto | Observación |
+|---------|-------------|
+| Integración multimodal | Permite control natural por gestos y voz coordinados. |
+| Robustez | Funciona en tiempo real, pero requiere buena iluminación y claridad vocal. |
+| Extensión posible | Agregar retroalimentación visual (textos o íconos en pantalla). |
+| Mejoras futuras | Soporte para más gestos, comandos personalizados y respuesta de audio. |
