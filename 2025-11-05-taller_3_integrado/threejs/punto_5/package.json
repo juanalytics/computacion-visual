@@ -1,0 +1,22 @@
+{
+  "name": "360-viewer-taller3",
+  "version": "1.0.0",
+  "description": "Visualizador 360° para el Taller 3 de Computación Visual",
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "http-server -p 8000"
+  },
+  "keywords": [
+    "360",
+    "panorama",
+    "three.js",
+    "webgl",
+    "equirectangular"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
+

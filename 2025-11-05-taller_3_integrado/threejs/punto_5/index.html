@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador 360° - Taller 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #controls-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 100;
+            min-width: 280px;
+            backdrop-filter: blur(10px);
+        }
+
+        #controls-panel h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #4CAF50;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button.active {
+            background: #2196F3;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #4CAF50;
+            word-break: break-all;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: white;
+            font-size: 14px;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-panel p {
+            margin: 5px 0;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 200;
+        }
+
+        @media (max-width: 768px) {
+            #controls-panel {
+                top: 10px;
+                left: 10px;
+                padding: 15px;
+                min-width: 240px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="controls-panel">
+        <h2>🌐 Controles 360°</h2>
+        
+        <div class="control-group">
+            <label>Modo de Visualización:</label>
+            <button id="toggle-mode">Imagen</button>
+        </div>
+
+        <div class="control-group">
+            <label>Cargar desde Local:</label>
+            <div class="file-input-wrapper">
+                <input type="file" id="file-input-image" accept="image/*">
+                <button id="load-image-btn">📷 Cargar Imagen 360°</button>
+            </div>
+            <div class="file-input-wrapper" style="margin-top: 5px;">
+                <input type="file" id="file-input-video" accept="video/*">
+                <button id="load-video-btn">🎥 Cargar Video 360°</button>
+            </div>
+            <div id="file-info" class="file-info"></div>
+        </div>
+
+        <div class="control-group">
+            <label>Escena/Panorama:</label>
+            <select id="scene-selector">
+                <option value="default">Escena 1 (Default)</option>
+                <option value="scene2">Escena 2</option>
+                <option value="scene3">Escena 3</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Controles de Cámara:</label>
+            <button id="reset-camera">Reset Cámara</button>
+            <button id="toggle-gyro">Giroscopio: OFF</button>
+        </div>
+
+        <div class="control-group">
+            <label>Controles de Video:</label>
+            <button id="play-pause">▶ Play</button>
+            <button id="mute-unmute">🔊 Sonido</button>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <p><strong>Controles:</strong></p>
+        <p>🖱️ Arrastra para rotar vista</p>
+        <p>🔍 Rueda del mouse para zoom</p>
+        <p>⌨️ Flechas/WASD para navegar</p>
+        <p>📱 Usa giroscopio en móvil</p>
+    </div>
+
+    <div class="loading" id="loading">Cargando...</div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="viewer.js"></script>
+</body>
+</html>
+
