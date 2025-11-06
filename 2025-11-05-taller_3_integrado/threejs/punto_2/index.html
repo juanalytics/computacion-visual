@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 2: Modelado Procedural</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 380px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-group:last-child {
+            border-bottom: none;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 12px;
+            color: #4fc3f7;
+            font-size: 14px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #b0b0b0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #4fc3f7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            font-size: 12px;
+        }
+        
+        button:hover {
+            background: #29b6f6;
+        }
+        
+        button.secondary {
+            background: #666;
+        }
+        
+        button.secondary:hover {
+            background: #555;
+        }
+        
+        .info {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        
+        .value-display {
+            display: inline-block;
+            min-width: 40px;
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+        
+        .comparison-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(79, 195, 247, 0.1);
+            border-radius: 5px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="controls">
+        <div class="control-group">
+            <h3>🎨 Tipo de Geometría</h3>
+            <select id="geometry-type">
+                <option value="grid">Rejilla Procedural</option>
+                <option value="spiral">Espiral 2D</option>
+                <option value="spiral3d">Espiral 3D</option>
+                <option value="sierpinski">Fractal: Sierpinski Triangle</option>
+                <option value="koch">Fractal: Koch Snowflake</option>
+                <option value="terrain">Terreno Procedural</option>
+                <option value="wave">Onda Procedural</option>
+            </select>
+        </div>
+        
+        <div class="control-group" id="grid-controls">
+            <h3>⚙️ Parámetros - Rejilla</h3>
+            <label>Ancho: <span class="value-display" id="grid-width-value">10</span></label>
+            <input type="range" id="grid-width" min="2" max="50" step="1" value="10">
+            
+            <label>Alto: <span class="value-display" id="grid-height-value">10</span></label>
+            <input type="range" id="grid-height" min="2" max="50" step="1" value="10">
+            
+            <label>Espaciado: <span class="value-display" id="grid-spacing-value">1.0</span></label>
+            <input type="range" id="grid-spacing" min="0.5" max="3" step="0.1" value="1.0">
+        </div>
+        
+        <div class="control-group" id="spiral-controls" style="display: none;">
+            <h3>⚙️ Parámetros - Espiral</h3>
+            <label>Vueltas: <span class="value-display" id="spiral-turns-value">5</span></label>
+            <input type="range" id="spiral-turns" min="1" max="20" step="0.5" value="5">
+            
+            <label>Radio Inicial: <span class="value-display" id="spiral-radius-value">0.5</span></label>
+            <input type="range" id="spiral-radius" min="0.1" max="3" step="0.1" value="0.5">
+            
+            <label>Paso: <span class="value-display" id="spiral-step-value">0.1</span></label>
+            <input type="range" id="spiral-step" min="0.05" max="0.5" step="0.05" value="0.1">
+        </div>
+        
+        <div class="control-group" id="fractal-controls" style="display: none;">
+            <h3>⚙️ Parámetros - Fractal</h3>
+            <label>Iteraciones: <span class="value-display" id="fractal-iterations-value">3</span></label>
+            <input type="range" id="fractal-iterations" min="1" max="6" step="1" value="3">
+            
+            <label>Tamaño: <span class="value-display" id="fractal-size-value">5</span></label>
+            <input type="range" id="fractal-size" min="1" max="10" step="0.5" value="5">
+        </div>
+        
+        <div class="control-group" id="terrain-controls" style="display: none;">
+            <h3>⚙️ Parámetros - Terreno</h3>
+            <label>Resolución: <span class="value-display" id="terrain-resolution-value">20</span></label>
+            <input type="range" id="terrain-resolution" min="10" max="50" step="5" value="20">
+            
+            <label>Altura Máxima: <span class="value-display" id="terrain-height-value">2.0</span></label>
+            <input type="range" id="terrain-height" min="0.5" max="5" step="0.1" value="2.0">
+            
+            <label>Frecuencia: <span class="value-display" id="terrain-frequency-value">0.5</span></label>
+            <input type="range" id="terrain-frequency" min="0.1" max="2" step="0.1" value="0.5">
+        </div>
+        
+        <div class="control-group" id="wave-controls" style="display: none;">
+            <h3>⚙️ Parámetros - Onda</h3>
+            <label>Amplitud: <span class="value-display" id="wave-amplitude-value">1.0</span></label>
+            <input type="range" id="wave-amplitude" min="0.1" max="3" step="0.1" value="1.0">
+            
+            <label>Frecuencia: <span class="value-display" id="wave-frequency-value">1.0</span></label>
+            <input type="range" id="wave-frequency" min="0.1" max="5" step="0.1" value="1.0">
+            
+            <label>Velocidad: <span class="value-display" id="wave-speed-value">1.0</span></label>
+            <input type="range" id="wave-speed" min="0" max="3" step="0.1" value="1.0">
+        </div>
+        
+        <div class="control-group">
+            <h3>🔄 Transformaciones Dinámicas</h3>
+            <label>Modificación de Vértices:</label>
+            <select id="vertex-modification">
+                <option value="none">Ninguna</option>
+                <option value="noise">Ruido (Noise)</option>
+                <option value="wave">Ondas</option>
+                <option value="twist">Torsión (Twist)</option>
+                <option value="bend">Curvatura (Bend)</option>
+            </select>
+            
+            <label>Intensidad: <span class="value-display" id="mod-intensity-value">1.0</span></label>
+            <input type="range" id="mod-intensity" min="0" max="3" step="0.1" value="1.0">
+            
+            <button id="animate-vertices">Animar Vértices</button>
+        </div>
+        
+        <div class="control-group">
+            <h3>📊 Comparativa</h3>
+            <button id="toggle-comparison">Mostrar Comparativa</button>
+            <div class="comparison-info" id="comparison-info" style="display: none;">
+                <strong>Procedural:</strong> Generado por código<br>
+                <strong>Manual:</strong> Geometría básica de Three.js<br><br>
+                <strong>Ventajas Procedural:</strong><br>
+                • Variabilidad infinita<br>
+                • Control preciso por parámetros<br>
+                • Generación eficiente<br>
+                • Fácil de animar y modificar
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <h3>🎬 Animación</h3>
+            <button id="toggle-animation">Iniciar Animación</button>
+            <button class="secondary" id="reset-geometry">Reset Geometría</button>
+        </div>
+    </div>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
+
