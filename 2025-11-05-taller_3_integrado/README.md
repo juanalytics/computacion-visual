@@ -317,30 +317,42 @@ useEffect(() => {
 ---
 
 
-🖐️ 7. Detección de Gestos con MediaPipe y OpenCV
-🎯 Concepto del proyecto
+# 🖐️ 7. Detección de Gestos con MediaPipe y OpenCV
 
-Este proyecto implementa un sistema de detección de gestos en tiempo real utilizando MediaPipe Hands y OpenCV.
+## 🎯 Concepto del proyecto
+Este proyecto implementa un sistema de detección de gestos en tiempo real utilizando **MediaPipe Hands** y **OpenCV**.  
 El sistema reconoce la posición de las manos, cuenta los dedos extendidos y mapea gestos específicos a acciones visuales —todo sin necesidad de hardware especializado.
 
 El objetivo es crear una interfaz gestual funcional que pueda integrarse en juegos, visualizaciones interactivas o sistemas de control basados en visión por computadora.
 
-🛠️ Herramientas y entorno utilizado
-Herramienta	Rol
-Python 3.x	Lenguaje principal
-OpenCV (cv2)	Captura de video y procesamiento de imagen
-MediaPipe Hands	Detección y tracking de landmarks de manos
-NumPy	Operaciones numéricas y arrays
-Jupyter Notebook	Entorno de desarrollo y documentación
-🧩 Módulos implementados
-Componente	Función
-Inicialización MediaPipe	Configuración de detección con parámetros de confianza
-Conteo de dedos	Algoritmo que identifica dedos extendidos por posición de landmarks
-Reconocimiento de gestos	Mapeo de número de dedos a gestos específicos
-Bucle de captura	Procesamiento en tiempo real de frames de cámara
-Feedback visual	Overlay de información y reacciones visuales en pantalla
-📌 Código relevante
-Inicialización de MediaPipe Hands
+---
+
+## 🛠️ Herramientas y entorno utilizado
+| Herramienta | Rol |
+|--------------|-----|
+| Python 3.x | Lenguaje principal |
+| OpenCV (cv2) | Captura de video y procesamiento de imagen |
+| MediaPipe Hands | Detección y tracking de landmarks de manos |
+| NumPy | Operaciones numéricas y manejo de arrays |
+| Jupyter Notebook | Entorno de desarrollo y documentación |
+
+---
+
+## 🧩 Módulos implementados
+| Componente | Función |
+|-------------|----------|
+| Inicialización MediaPipe | Configuración de detección con parámetros de confianza |
+| Conteo de dedos | Algoritmo que identifica dedos extendidos por posición de landmarks |
+| Reconocimiento de gestos | Mapeo de número de dedos a gestos específicos |
+| Bucle de captura | Procesamiento en tiempo real de frames de cámara |
+| Feedback visual | Overlay de información y reacciones visuales en pantalla |
+
+---
+
+## 📌 Código relevante
+
+### 🧱 Inicialización de MediaPipe Hands
+```python
 import cv2
 import mediapipe as mp
 
@@ -353,24 +365,23 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5
 )
+```
 
-Función de conteo de dedos
+### ✋ Función de conteo de dedos
+```python
 def contar_dedos(hand_landmarks):
     dedos = [0, 0, 0, 0, 0]  # pulgar → meñique
     landmarks = hand_landmarks.landmark
-
-    # Pulgar: comparar eje x (mano derecha vs izquierda)
     if landmarks[4].x < landmarks[3].x:
         dedos[0] = 1
-
-    # Otros dedos: comparar eje y de la punta con la base
     for i, tip in enumerate([8, 12, 16, 20]):
         if landmarks[tip].y < landmarks[tip - 2].y:
             dedos[i + 1] = 1
-
     return sum(dedos)
+```
 
-Reconocimiento de gestos específicos
+### 🧠 Reconocimiento de gestos específicos
+```python
 def reconocer_gesto(n_dedos):
     if n_dedos == 0:
         return "PUÑO"
@@ -382,122 +393,100 @@ def reconocer_gesto(n_dedos):
         return "ABIERTO"
     else:
         return "INDEFINIDO"
+```
 
-Bucle principal con feedback visual
+### 🎥 Bucle principal con feedback visual
+```python
 cap = cv2.VideoCapture(0)
-
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-
     frame = cv2.flip(frame, 1)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(rgb)
-
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
             dedos = contar_dedos(hand_landmarks)
             gesto = reconocer_gesto(dedos)
-
             cv2.putText(frame, f'Dedos: {dedos} | Gesto: {gesto}', (10, 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 3)
-
-            # Reacción visual según el gesto
             if gesto == "ABIERTO":
                 cv2.rectangle(frame, (0, 0), (frame.shape[1], frame.shape[0]), (0, 255, 0), 50)
             elif gesto == "PUÑO":
                 cv2.rectangle(frame, (0, 0), (frame.shape[1], frame.shape[0]), (0, 0, 255), 50)
-
     cv2.imshow('Detección de gestos - Taller 7', frame)
-    if cv2.waitKey(1) & 0xFF == 27:  # ESC para salir
+    if cv2.waitKey(1) & 0xFF == 27:
         break
-
 cap.release()
 cv2.destroyAllWindows()
+```
 
-🎮 Gestos implementados
-Gesto	Dedos	Acción Visual	Uso Potencial
-✊ PUÑO	0	Borde rojo	Stop, pausa, cerrar
-👉 SEÑALAR	1	Borde amarillo	Seleccionar, apuntar
-✌️ PAZ	2	Borde magenta	Confirmar, modo secundario
-✋ ABIERTO	5	Borde verde	Play, activar, expandir
-🤚 OTROS	3–4	Sin reacción	Transiciones
-🖼️ Capacidades del sistema
-✅ Detección en tiempo real
+---
 
-Procesamiento a ~30 FPS en hardware estándar
+## 🎮 Gestos implementados
+| Gesto | Dedos | Acción Visual | Uso Potencial |
+|-------|--------|----------------|----------------|
+| ✊ PUÑO | 0 | Borde rojo | Stop, pausa, cerrar |
+| 👉 SEÑALAR | 1 | Borde amarillo | Seleccionar, apuntar |
+| ✌️ PAZ | 2 | Borde magenta | Confirmar, modo secundario |
+| ✋ ABIERTO | 5 | Borde verde | Play, activar, expandir |
+| 🤚 OTROS | 3–4 | Sin reacción | Transiciones |
 
-Tracking de hasta 2 manos simultáneas
+---
 
-21 landmarks por mano detectados
+## 🖼️ Capacidades del sistema
+### ✅ Detección en tiempo real
+- Procesamiento a ~30 FPS en hardware estándar  
+- Tracking de hasta 2 manos simultáneas  
+- 21 landmarks por mano detectados  
 
-✅ Robustez
+### ✅ Robustez
+- Funciona bajo distintas condiciones de iluminación  
+- No requiere calibración previa  
+- Tolerante a diversos tonos de piel  
 
-Funciona con diferentes condiciones de iluminación
+### ✅ Feedback visual inmediato
+- Overlay del esqueleto de la mano  
+- Texto con conteo y tipo de gesto  
+- Borde coloreado según el gesto detectado  
 
-No requiere calibración previa
+---
 
-Tolerante a distintos tonos de piel
+## 💡 Aplicaciones potenciales
+- 🎮 **Juegos sin contacto:** control de menús o personajes  
+- 🖥️ **Presentaciones interactivas:** avanzar slides con gestos  
+- 🎨 **Arte generativo:** modificar parámetros visuales en tiempo real  
+- 🧏 **Accesibilidad:** interfaces para personas con movilidad reducida  
+- 🏛️ **Instalaciones:** experiencias museográficas interactivas  
+- 🌐 **Integración con Three.js:** control de cámara y objetos 3D  
 
-✅ Feedback visual inmediato
+---
 
-Overlay del esqueleto de la mano
+## 🧠 Reflexión: aprendizajes, retos y mejoras
+### ✅ Aprendizajes obtenidos
+- MediaPipe ofrece detección robusta sin entrenamiento personalizado  
+- La combinación OpenCV + MediaPipe es eficiente para prototipos rápidos  
+- El conteo de dedos requiere lógica diferente para el pulgar  
+- El feedback visual mejora notablemente la experiencia de usuario  
 
-Texto informativo de conteo y gesto
+### ⚠️ Retos técnicos
+- La detección puede fallar con manos muy cerca del borde del frame  
+- Gestos ambiguos (3–4 dedos) requieren contexto adicional  
+- Ruido en detección: se necesita suavizado temporal  
+- Diferentes orientaciones afectan el conteo del pulgar  
 
-Cambios de color según gesto detectado
+### 🚀 Mejoras futuras
+- Suavizado temporal con **Filtro de Kalman**  
+- Detección de secuencias gestuales (ejemplo: saludo)  
+- Integración **OSC** con Unity, Processing o TouchDesigner  
+- Nuevos gestos estáticos: *Rock, Spock, OK, Thumbs Up*  
+- Gestos dinámicos: *Swipe, Pinch, Rotate*  
+- **Depth tracking** para controles 3D  
+- Clasificador Machine Learning para gestos complejos  
+- Versión web con **MediaPipe JS**
 
-💡 Aplicaciones potenciales
 
-Juegos sin contacto: control de menús o personajes
 
-Presentaciones interactivas: avanzar slides con gestos
 
-Arte generativo: modificar parámetros visuales en tiempo real
-
-Accesibilidad: interfaces para personas con movilidad reducida
-
-Instalaciones: experiencias museográficas interactivas
-
-Integración con Three.js: control de cámara y objetos 3D
-
-🧠 Reflexión: aprendizajes, retos y mejoras
-✅ Aprendizajes obtenidos
-
-MediaPipe ofrece detección robusta sin entrenamiento personalizado
-
-La combinación cv2 + MediaPipe es eficiente para prototipos rápidos
-
-El conteo de dedos requiere lógica distinta para el pulgar
-
-El feedback visual mejora la experiencia de usuario
-
-⚠️ Retos técnicos
-
-Fallos con manos muy cercanas al borde del frame
-
-Gestos ambiguos (3–4 dedos) necesitan contexto adicional
-
-Ruido en detección requiere suavizado temporal
-
-Diferentes orientaciones afectan el conteo del pulgar
-
-🚀 Mejoras futuras
-
-Suavizado temporal con Filtro de Kalman
-
-Secuencias gestuales (p. ej., saludo)
-
-Integración OSC con Unity o Processing
-
-Nuevos gestos estáticos: Rock, Spock, OK, Thumbs Up
-
-Gestos dinámicos: swipe, pinch, rotate
-
-Depth tracking para controles 3D
-
-Clasificador ML para gestos complejos
-
-Versión web con MediaPipe JS
