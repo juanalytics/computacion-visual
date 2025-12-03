@@ -1,0 +1,16 @@
+# Configuración por defecto para el módulo de detección
+model_path: "yolov8n.pt"
+source: 0  # webcam por defecto
+ws_url: "ws://localhost:8000/ws"
+confidence: 0.25
+iou: 0.45
+max_det: 100
+save_dir: "results/detection/runs"
+batch_output: "results/detection/batch"
+batch_annotate: "results/detection/batch/annotated"
+segment_output: "results/detection/segment/masks"
+segment_overlay: "results/detection/segment/overlays"
+segment_model: "deeplabv3_resnet50"
+emit: true
+display: false
+

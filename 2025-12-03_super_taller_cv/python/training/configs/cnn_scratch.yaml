@@ -1,0 +1,15 @@
+seed: 42
+dataset: "cifar10"
+data_dir: "data/processed/cifar10"
+batch_size: 128
+num_workers: 4
+epochs: 1
+learning_rate: 0.001
+weight_decay: 0.0005
+model_name: "cnn_scratch_v1"
+output_dir: "results/training/cnn_scratch"
+log_interval: 50
+device: "cuda"  # usa "cpu" si no hay GPU
+train_fraction: 0.1
+val_fraction: 0.1
+

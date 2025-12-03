@@ -1,0 +1,26 @@
+# Entornos y dependencias
+.venv/
+.env
+__pycache__/
+*.pyc
+
+# Datos y modelos pesados
+data/raw/
+data/processed/
+data/models/
+
+# Resultados y artefactos generados
+results/
+*.mp4
+*.gif
+*.avi
+*.mov
+
+# Archivos temporales
+.DS_Store
+Thumbs.db
+
+# IDE/OS
+.vscode/
+.idea/
+
