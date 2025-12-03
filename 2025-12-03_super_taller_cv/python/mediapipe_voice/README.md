@@ -9,11 +9,11 @@
 
 ## Backlog inicial
 
-1. `gesture_pipeline.py`: detección de gestos + normalización (mano derecha, posturas).
-2. `voice_pipeline.py`: SpeechRecognition + PyAudio + pyttsx3 para feedback.
-3. `eeg_simulator.py`: generador de señales y lógica de umbrales.
-4. `fusion_engine.py`: combina señales, resuelve conflictos y emite comandos JSON.
-5. `config/gestures.yaml`, `config/voice.yaml`, etc. para parametrizar acciones.
+1. `gesture_pipeline.py`: detección de gestos + normalización (mano derecha, posturas) ✅.
+2. `voice_pipeline.py`: SpeechRecognition + PyAudio + pyttsx3 para feedback (voz → comandos) ✅.
+3. `eeg_simulator.py`: generador de señales y lógica de umbrales ✅.
+4. `fusion_engine.py`: combina señales, resuelve conflictos y emite comandos JSON ✅.
+5. `configs/default.yaml`: parametrización central de acciones/umbrales ✅.
 
 ## Integración con otros módulos
 
@@ -29,4 +29,31 @@
 - Estabilidad de umbrales EEG (falsos positivos/negativos).
 
 Documenta pruebas y configuraciones en `docs/METRICAS.md` y en `results/multimodal/`.
+
+## Uso rápido
+
+Detectar gestos desde webcam/video:
+
+```bash
+python python/mediapipe_voice/gesture_pipeline.py --source 0 --display
+```
+
+Reconocimiento de voz (archivo de audio):
+
+```bash
+python python/mediapipe_voice/voice_pipeline.py --audio-file samples/command.wav
+```
+
+Simulador EEG:
+
+```bash
+python python/mediapipe_voice/eeg_simulator.py --interval 0.5
+```
+
+Fusionar eventos pregrabados:
+
+```bash
+python python/mediapipe_voice/fusion_engine.py \
+  --events python/mediapipe_voice/examples/sample_events.json
+```
 

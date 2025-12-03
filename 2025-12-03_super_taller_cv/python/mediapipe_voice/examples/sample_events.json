@@ -1,0 +1,26 @@
+[
+  {
+    "type": "command",
+    "payload": {
+      "action": "change_material",
+      "source": "gesture",
+      "confidence": 0.8
+    }
+  },
+  {
+    "type": "eeg_sample",
+    "payload": {
+      "value": 0.85,
+      "threshold": 0.7
+    }
+  },
+  {
+    "type": "command",
+    "payload": {
+      "action": "switch camera",
+      "source": "voice",
+      "confidence": 0.9
+    }
+  }
+]
+

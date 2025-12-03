@@ -14,7 +14,7 @@ Consolida aquí todas las métricas cuantitativas solicitadas en la rúbrica.
 | Experimento | Arquitectura | Epochs | Accuracy | F1 | Loss val | Comentarios |
 | --- | --- | --- | --- | --- | --- | --- |
 | CNN-SCRATCH | SimpleCNN | 1 | 0.333 | _(pendiente)_ | 1.735 | Subconjunto 10% CIFAR10, resultados en `results/training/cnn_scratch/metrics.json` |
-| FT-RESNET | ResNet50 FT | _(pendiente)_ | _(pendiente)_ | _(pendiente)_ | _(pendiente)_ | _(pendiente)_ |
+| FT-RESNET | ResNet18 FT | 1 | 0.806 | _(pendiente)_ | 0.571 | 10% CIFAR10 con ImageNet weights, archivo en `results/training/resnet18_finetune/metrics.json` |
 
 ## 3. Interacción multimodal
 
