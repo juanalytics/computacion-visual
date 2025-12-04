@@ -88,7 +88,7 @@ Se creó una escena 3D equilibrada con múltiples formas geométricas básicas o
 *Demostración de las animaciones y el uso de OrbitControls*
 
 ![Animación de Procesamiento](threejs\gifs\resultados.gif)
-
+*Demostracion de animaciones*
 
 ### Implementación Técnica
 
