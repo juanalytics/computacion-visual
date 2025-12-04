@@ -87,6 +87,9 @@ Se creó una escena 3D equilibrada con múltiples formas geométricas básicas o
 ![Animaciones y Controles](threejs/gifs/animaciones_controles.gif)
 *Demostración de las animaciones y el uso de OrbitControls*
 
+![Animación de Procesamiento](threejs\gifs\resultados.gif)
+
+
 ### Implementación Técnica
 
 **Cambio de perspectiva**: Se implementó mediante dos configuraciones de posición de cámara predefinidas. Al hacer clic en el botón, la cámara se mueve suavemente a la nueva posición usando OrbitControls.
