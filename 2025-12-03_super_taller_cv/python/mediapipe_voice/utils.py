@@ -15,3 +15,4 @@ def load_config(path: Path | None = None) -> Dict[str, Any]:
     with target.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle)
 
+

@@ -25,11 +25,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def normalize_command(text: str, grammar: list[str]) -> str | None:
+def normalize_command(text: str, mapping: dict[str, str]) -> str | None:
     normalized = text.lower().strip()
-    for phrase in grammar:
+    for phrase, action in mapping.items():
         if phrase in normalized:
-            return phrase
+            return action
     return None
 
 
@@ -39,14 +39,14 @@ def main() -> None:
     ws_url = args.ws_url if args.ws_url is not None else cfg.get("ws_url")
     if ws_url and ws_url.lower() == "none":
         ws_url = None
-    grammar = cfg["voice"].get("grammar", [])
+    mapping = cfg["voice"].get("commands", {})
 
     recognizer = sr.Recognizer()
     recognizer.energy_threshold = cfg["voice"].get("energy_threshold", 300)
     recognizer.pause_threshold = cfg["voice"].get("pause_threshold", 0.8)
 
     def emit(text: str):
-        command = normalize_command(text, grammar)
+        command = normalize_command(text, mapping)
         message = {
             "timestamp": time.time(),
             "module": "multimodal",

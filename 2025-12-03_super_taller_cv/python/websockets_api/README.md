@@ -20,7 +20,8 @@
 | --- | --- | --- |
 | WS | `/ws` | Canal multipropósito (diferenciar por `type` en payload). |
 | REST | `/health` | Estado del servidor. |
-| REST | `/metrics/latest` | Últimas métricas agregadas. |
+| REST | `/metrics/latest` | Últimas métricas agregadas (orden descendente). |
+| REST | `/commands/recent` | Últimos comandos/fusiones registrados. |
 
 ## Flujo
 
@@ -28,5 +29,11 @@
 2. El broker reemite a todos los clientes suscritos (pub/sub simple).
 3. Métricas relevantes se guardan y se exponen al dashboard.
 
-Desarrolla este servicio temprano para habilitar integraciones paralelas.
+### Ejecución
+
+```bash
+uvicorn python.websockets_api.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Los datos se almacenan en `results/backend/state.db` (SQLite). Asegúrate de que los módulos clientes envíen mensajes `type="metrics"` para que el dashboard los muestre.
 

@@ -44,6 +44,8 @@ Reconocimiento de voz (archivo de audio):
 python python/mediapipe_voice/voice_pipeline.py --audio-file samples/command.wav
 ```
 
+La sección `voice.commands` del YAML mapea frases a acciones del WS (`change_material`, `switch_camera`, `trigger_animation`, `toggle_light`, etc.). Cualquier frase que contenga esa clave activará la acción correspondiente.
+
 Simulador EEG:
 
 ```bash

@@ -13,7 +13,8 @@
 2. `scripts/inference.py`: pipeline tiempo real (webcam/video) + publicación WS (implementado).
 3. `scripts/batch_export.py`: procesa datasets y genera anotaciones+JSON en `results/` (implementado).
 4. `scripts/segment.py`: segmentación semántica con DeepLab (implementado, extensible a otros modelos).
-5. Pruebas unitarias básicas (verificación de formatos JSON, validación de FPS mínimos).
+5. `scripts/mock_publisher.py`: envía detecciones simuladas al WS para pruebas de la escena 3D (implementado).
+6. Pruebas unitarias básicas (verificación de formatos JSON, validación de FPS mínimos).
 
 ## Estructura esperada
 
@@ -91,6 +92,18 @@ Parámetros clave:
 - `--limit`: procesa solo N archivos para pruebas.
 
 ## Pruebas
+### Simulador de detecciones (`scripts/mock_publisher.py`)
+
+Permite probar el overlay en Three.js sin correr YOLO:
+
+```bash
+python python/detection/scripts/mock_publisher.py --ws-url ws://127.0.0.1:8000/ws
+```
+
+Opciones útiles:
+
+- `--width/--height`: resolución del frame simulado.
+- `--interval`: tiempo entre mensajes (s).
 
 Ejecuta los tests de utilidades con:
 

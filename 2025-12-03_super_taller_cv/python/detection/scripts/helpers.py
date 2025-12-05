@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
@@ -61,8 +61,10 @@ def detections_to_items(result) -> List[Dict[str, Any]]:
     return items
 
 
-def build_detection_message(result, fps: float, latency_ms: float) -> Dict[str, Any]:
-    return {
+def build_detection_message(
+    result, fps: float, latency_ms: float, frame_shape: Optional[Tuple[int, int]] = None
+) -> Dict[str, Any]:
+    payload = {
         "timestamp": datetime.utcnow().isoformat(),
         "module": "detection",
         "type": "detections",
@@ -72,4 +74,8 @@ def build_detection_message(result, fps: float, latency_ms: float) -> Dict[str, 
             "items": detections_to_items(result),
         },
     }
+    if frame_shape:
+        height, width = frame_shape
+        payload["payload"]["frame"] = {"width": width, "height": height}
+    return payload
 

@@ -1,27 +1,43 @@
-# Escena Three.js / React Three Fiber
+# Three.js + React Three Fiber
 
-## Objetivos
+Este subproyecto usa **Vite + React + TypeScript** y monta una escena en **React Three Fiber** que se sincroniza con el broker WebSocket.
 
-- Construir escena principal en WebGL con React Three Fiber (R3F).
-- Incluir overlays dinámicos (HUD para detecciones) y modo AR (AR.js o WebXR).
-- Escuchar comandos del broker WebSocket para modificar materiales, luces, cámaras y animaciones.
+## Características actuales
 
-## Backlog inicial
+- Escena con un cubo animado, luces y `MeshDistortMaterial`.
+- Overlay HUD con estado de conexión al WS (`connecting`, `connected`, `error`).
+- Overlay de detecciones: escucha mensajes `type: "detections"` y pinta bounding boxes en pantalla. Se espera que el payload incluya `frame: {width, height}` (ya enviado por `scripts/inference.py` o `scripts/mock_publisher.py`).
+- Cliente WebSocket (`useWsCommands`) que escucha `type: "command"` o `type: "fusion_command"` y aplica:
+  - `change_material`: cambia el color del cubo (usa color enviado o genera uno aleatorio).
+  - `trigger_animation`: aplica un “pulse” temporal (escala animada).
+  - `switch_camera`: placeholder listo para extender (p.ej. alternar posiciones de cámara).
+- Dependencias clave: `@react-three/fiber`, `@react-three/drei`, `zustand` (para futuros estados compartidos), `three`.
 
-1. Inicializar proyecto (Vite + React + TypeScript recomendado).
-2. Configurar R3F + Drei + Zustand para manejo de estado.
-3. Implementar `wsClient.ts` que procese mensajes `command` y `detections`.
-4. Crear componentes:
-   - `DetectionOverlay`: proyecta bounding boxes en pantalla.
-   - `SceneController`: aplica cambios de materiales/cámaras.
-   - `ARMarkerScene`: modo AR opcional.
-5. Optimización visual: LOD, compresión de texturas, control de sombras.
+## Scripts
 
-## Métricas de performance
+```bash
+npm install      # Una sola vez
+npm run dev      # Servidor HMR en http://localhost:5173
+npm run build    # Compila a dist/
+npm run preview  # Vista previa de producción
+npm run lint     # ESLint + TypeScript checks
+```
 
-- FPS objetivo ≥ 60 (desktop), ≥ 30 (mobile).
-- Peso total de assets < 20 MB.
-- Latencia de reacción < 150 ms desde comando recibido.
+## Configurar la URL del WebSocket
 
-Registrar pruebas en `docs/METRICAS.md` y generar GIFs (`docs/EVIDENCIAS.md`).
+Por defecto se conecta a `ws://localhost:8000/ws`. Para apuntar a otro host/puerto:
 
+```js
+localStorage.setItem("threejs_ws_url", "ws://127.0.0.1:8000/ws");
+location.reload();
+```
+
+## Próximos pasos
+
+- Dibujar overlays de detecciones (HUD con bounding boxes coordinados).
+- Consumir detecciones reales desde el pipeline de visión y validar la precisión visual. Mientras tanto, puedes usar `python python/detection/scripts/mock_publisher.py --ws-url ws://127.0.0.1:8000/ws` para simular detecciones.
+- Añadir assets GLTF y animaciones más complejas.
+- Integrar cambios de cámara/luz con los comandos de multimodalidad.
+- Preparar modo AR/WebXR o integración con AR.js según la rúbrica.
+
+Documenta métricas de FPS/latencia en `docs/METRICAS.md` y captura GIFs para `docs/EVIDENCIAS.md` cuando la escena esté lista para la demo.

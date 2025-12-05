@@ -36,3 +36,4 @@ class SimpleCNN(nn.Module):
         x = self.features(x)
         return self.classifier(x)
 
+

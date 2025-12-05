@@ -126,10 +126,20 @@ def main() -> None:
                 result = results[0]
                 stats.append({"fps": fps, "latency_ms": latency_ms})
 
-                message = build_detection_message(result, fps=fps, latency_ms=latency_ms)
+                frame_shape = frame.shape[:2]
+                message = build_detection_message(
+                    result, fps=fps, latency_ms=latency_ms, frame_shape=frame_shape
+                )
 
                 if emit:
                     publisher.publish(message)
+                    metrics_message = {
+                        "timestamp": message["timestamp"],
+                        "module": "detection",
+                        "type": "metrics",
+                        "payload": {"metrics": {"fps": fps, "latency_ms": latency_ms}},
+                    }
+                    publisher.publish(metrics_message)
 
                 annotated = result.plot() if display or save_dir else None
                 if display and annotated is not None:
